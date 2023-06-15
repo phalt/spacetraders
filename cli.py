@@ -13,18 +13,33 @@ def cli_group():
 
 
 @click.command()
-def test_api_connectivity():
+@click.argument("symbol")
+@click.argument("faction", default="COSMIC")
+def register(symbol, faction):
     """
-    Basic API call to Spacetraders to test connectivity
+    Register a new agent.
     """
-    from src.schemas import Agent
+    from src.schemas import AgentManager, Error
     from rich.pretty import pprint
-    from rich import print
+    from structlog import get_logger
 
-    result = Agent.me()
-    pprint("API connection established, here is your Agent details:")
-    print(str(result))
-    pprint(result)
+    log = get_logger(__name__)
+
+    result = AgentManager.register_new(symbol=symbol, faction=faction)
+    if isinstance(result, Error):
+        pprint(result)
+    else:
+        content = f"""
+Agent created!
+Copy and paste this into a file called `env.ini` in the project root to get started:
+
+[api]
+key = {result.token}
+
+After you saved that run `make query q='me'` to test it all worked
+"""
+
+        log.info(content)
 
 
 @click.command()
@@ -40,7 +55,8 @@ def me():
 
 
 @click.command()
-def contracts():
+@click.argument("depth", default=1)
+def contracts(depth):
     """
     Returns contracts available to you
     """
@@ -48,12 +64,13 @@ def contracts():
     from rich.pretty import pprint
 
     result = ContractManager.get()
-    pprint(result)
+    pprint(result, max_depth=int(depth))
 
 
 @click.command()
 @click.argument("symbol")
-def waypoint(symbol):
+@click.argument("depth", default=1)
+def waypoint(symbol, depth):
     """
     Return Waypoint information
     """
@@ -61,12 +78,13 @@ def waypoint(symbol):
     from rich.pretty import pprint
 
     result = Waypoint.get(symbol=symbol)
-    pprint(result)
+    pprint(result, max_depth=depth)
 
 
 @click.command()
 @click.argument("symbol")
-def shipyard(symbol):
+@click.argument("depth", default=1)
+def shipyard(symbol, depth):
     """
     Return Shipyard information
     """
@@ -74,12 +92,13 @@ def shipyard(symbol):
     from rich.pretty import pprint
 
     result = Shipyard.get(symbol=symbol)
-    pprint(result)
+    pprint(result, max_depth=int(depth))
 
 
 @click.command()
 @click.argument("symbol")
-def ship(symbol):
+@click.argument("depth", default=1)
+def ship(symbol, depth):
     """
     Return Ship information
     """
@@ -87,11 +106,12 @@ def ship(symbol):
     from rich.pretty import pprint
 
     result = Ship.get(symbol=symbol)
-    pprint(result)
+    pprint(result, max_depth=int(depth))
 
 
 @click.command()
-def ships():
+@click.argument("depth", default=1)
+def ships(depth):
     """
     Return all ship information
     """
@@ -99,12 +119,13 @@ def ships():
     from rich.pretty import pprint
 
     result = ShipsManager.all()
-    pprint(result)
+    pprint(result, max_depth=int(depth))
 
 
 @click.command()
 @click.argument("symbol")
-def system_waypoints(symbol):
+@click.argument("depth", default=1)
+def system_waypoints(symbol, depth):
     """
     Return SystemWaypoints information
     """
@@ -112,10 +133,10 @@ def system_waypoints(symbol):
     from rich.pretty import pprint
 
     result = SystemWaypoints.get(symbol=symbol)
-    pprint(result)
+    pprint(result, max_depth=int(depth))
 
 
-cli_group.add_command(test_api_connectivity)
+cli_group.add_command(register)
 cli_group.add_command(me)
 cli_group.add_command(contracts)
 cli_group.add_command(waypoint)

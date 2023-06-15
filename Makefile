@@ -25,5 +25,5 @@ test_api:  ## Test the application works by making API requests to spacetraders
 shell:  ## Run an ipython shell
 	poetry run ipython
 
-run:  ## Run various queries against the CLI file. Use like `make run query="me"`
-	poetry run python cli.py $(query)
+query:  ## Run various queries against the CLI file. Use like `make query q="me"`
+	poetry run python cli.py $(q)

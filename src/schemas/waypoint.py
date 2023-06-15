@@ -8,7 +8,7 @@ from src.api import client, PATHS
 
 
 @attrs.define
-class Faction:
+class WaypointFaction:
     symbol: str
 
 
@@ -41,7 +41,7 @@ class Waypoint:
     orbitals: List[Orbital]
     traits: List[Trait]
     chart: Chart
-    faction: Faction
+    faction: WaypointFaction
 
     @classmethod
     def build(cls, data: Dict) -> Self:

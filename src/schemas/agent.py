@@ -1,9 +1,14 @@
-from typing import Self
+from typing import Self, Union
 import attrs
 
 from .waypoint import Waypoint
 
-from src.api import client, PATHS
+from src.api import client, PATHS, bare_client
+from src.api.utils import data_or_error
+from .contracts import Contract
+from .ships import Ship
+from .factions import Faction
+from .errors import Error
 
 
 @attrs.define
@@ -28,3 +33,28 @@ class Agent:
 
     def headquarters_info(self) -> Waypoint:
         return Waypoint.get(self.headquarters)
+
+
+@attrs.define
+class AgentManager:
+    token: str
+    agent: Agent
+    contract: Contract
+    faction: Faction
+    ship: Ship
+
+    @classmethod
+    def register_new(cls, symbol: str, faction: str) -> Union[Self, Error]:
+        api_response = bare_client.post(
+            PATHS.REGISTER, data={"symbol": symbol, "faction": faction}
+        )
+        result = data_or_error(api_response=api_response)
+        if isinstance(result, dict):
+            return cls(
+                token=result["token"],
+                agent=Agent(**result["agent"]),
+                contract=Contract.build(result["contract"]),
+                faction=Faction(**result["faction"]),
+                ship=Ship.build(result["ship"]),
+            )
+        return result
