@@ -11,6 +11,7 @@ class Paths:
 
     REGISTER: str = f"{BASE_PATH}/register"
     AGENT: str = f"{BASE_PATH}/my/agent"
+    CONTRACTS: str = f"{BASE_PATH}/my/contracts"
 
     def waypoint(self, symbol) -> str:
         """

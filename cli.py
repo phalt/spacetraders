@@ -40,6 +40,18 @@ def me():
 
 
 @click.command()
+def contracts():
+    """
+    Returns contracts available to you
+    """
+    from src.schemas import ContractList
+    from rich.pretty import pprint
+
+    result = ContractList.get()
+    pprint(result)
+
+
+@click.command()
 @click.argument("symbol")
 def waypoint(symbol):
     """
@@ -54,6 +66,7 @@ def waypoint(symbol):
 
 cli_group.add_command(test_api_connectivity)
 cli_group.add_command(me)
+cli_group.add_command(contracts)
 cli_group.add_command(waypoint)
 
 if __name__ == "__main__":
