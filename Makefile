@@ -21,3 +21,6 @@ clear-caches:  ## Clear any cache files
 
 test_api:  ## Test the application works by making API requests to spacetraders
 	poetry run python cli.py test-api-connectivity
+
+shell:  ## Run an ipython shell
+	poetry run ipython

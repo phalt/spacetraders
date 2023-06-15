@@ -13,11 +13,13 @@ def test_api_connectivity():
     """
     Basic API call to Spacetraders to test connectivity
     """
-    from src.api.client import test_connectivity
+    from src.schemas import Agent
     from rich.pretty import pprint
+    from rich import print
 
-    result = test_connectivity()
+    result = Agent.me()
     pprint("API connection established, here is your Agent details:")
+    print(str(result))
     pprint(result)
 
 
