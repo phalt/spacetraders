@@ -56,7 +56,7 @@ class Contract:
 
 
 @attrs.define
-class ContractList:
+class ContractManager:
     """
     Represents all the contracts available to you.
     """

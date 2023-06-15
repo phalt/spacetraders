@@ -13,6 +13,10 @@ Set up your environment variables in a file called `env.ini` in the root of this
 ```ini
 [api]
 key = ASK_PAUL_FOR_KEY
+
+[time]
+; Show timestamps in this timezone
+zone = "Pacific/Auckland"
 ```
 
 Test run the application:

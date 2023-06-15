@@ -44,10 +44,10 @@ def contracts():
     """
     Returns contracts available to you
     """
-    from src.schemas import ContractList
+    from src.schemas import ContractManager
     from rich.pretty import pprint
 
-    result = ContractList.get()
+    result = ContractManager.get()
     pprint(result)
 
 
@@ -79,6 +79,19 @@ def shipyard(symbol):
 
 @click.command()
 @click.argument("symbol")
+def ship(symbol):
+    """
+    Return Ship information
+    """
+    from src.schemas import Ship
+    from rich.pretty import pprint
+
+    result = Ship.get(symbol=symbol)
+    pprint(result)
+
+
+@click.command()
+@click.argument("symbol")
 def system_waypoints(symbol):
     """
     Return SystemWaypoints information
@@ -95,6 +108,7 @@ cli_group.add_command(me)
 cli_group.add_command(contracts)
 cli_group.add_command(waypoint)
 cli_group.add_command(shipyard)
+cli_group.add_command(ship)
 cli_group.add_command(system_waypoints)
 
 if __name__ == "__main__":
