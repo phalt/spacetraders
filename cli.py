@@ -136,6 +136,22 @@ def system_waypoints(symbol, depth):
     pprint(result, max_depth=int(depth))
 
 
+@click.command()
+@click.argument("ship")
+@click.argument("waypoint")
+@click.argument("depth", default=1)
+def buy_ship(ship, waypoint, depth):
+    """
+    Purchase a ship.
+    You must have a ship docked at this waypoint to purchase.
+    """
+    from src.schemas import ShipsManager
+    from rich.pretty import pprint
+
+    result = ShipsManager.buy_ship(ship_type=ship, waypoint_symbol=waypoint)
+    pprint(result, max_depth=int(depth))
+
+
 cli_group.add_command(register)
 cli_group.add_command(me)
 cli_group.add_command(contracts)
@@ -143,6 +159,7 @@ cli_group.add_command(waypoint)
 cli_group.add_command(shipyard)
 cli_group.add_command(ship)
 cli_group.add_command(ships)
+cli_group.add_command(buy_ship)
 cli_group.add_command(system_waypoints)
 
 if __name__ == "__main__":

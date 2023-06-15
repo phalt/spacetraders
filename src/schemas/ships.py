@@ -1,12 +1,14 @@
-from typing import List, Dict, Self, Optional, Any
+from typing import List, Dict, Self, Optional, Any, Union
 import attrs
 
 from cachetools import cached
 
 from src.settings import cache
 from src.api import client, PATHS
+from src.api.utils import data_or_error
 
 from .nav import Nav
+from .errors import Error
 
 
 @attrs.define
@@ -160,11 +162,15 @@ class ShipsManager:
         )
 
     @staticmethod
-    def buy_ship(ship_type: str, waypoint_symbol: str) -> Ship:
+    def buy_ship(ship_type: str, waypoint_symbol: str) -> Union[Ship, Error]:
         """
         Purchase a ship
         """
         post_data = dict(shipType=ship_type, waypointSymbol=waypoint_symbol)
         api_result = client.post(PATHS.SHIPS, data=post_data)
-        api_result.raise_for_status()
-        return Ship(**api_result.json()["ship"])
+        result = data_or_error(api_result)
+        match result:
+            case dict():
+                return Ship(**result["ship"])
+            case _:
+                return result

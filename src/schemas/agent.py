@@ -49,12 +49,14 @@ class AgentManager:
             PATHS.REGISTER, data={"symbol": symbol, "faction": faction}
         )
         result = data_or_error(api_response=api_response)
-        if isinstance(result, dict):
-            return cls(
-                token=result["token"],
-                agent=Agent(**result["agent"]),
-                contract=Contract.build(result["contract"]),
-                faction=Faction(**result["faction"]),
-                ship=Ship.build(result["ship"]),
-            )
-        return result
+        match result:
+            case dict():
+                return cls(
+                    token=result["token"],
+                    agent=Agent(**result["agent"]),
+                    contract=Contract.build(result["contract"]),
+                    faction=Faction(**result["faction"]),
+                    ship=Ship.build(result["ship"]),
+                )
+            case _:
+                return result
