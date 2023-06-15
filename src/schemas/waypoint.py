@@ -46,11 +46,16 @@ class Waypoint:
     def build(cls, data: Dict) -> Self:
         orbitals = [Orbital(**x) for x in data.pop("orbitals")]
         traits = [Trait(**x) for x in data.pop("traits")]
-
         return cls(**data, orbitals=orbitals, traits=traits)
 
     @classmethod
     @cached(cache)
     def get(cls, symbol: str) -> Self:
         api_result = client.get(PATHS.waypoint(symbol=symbol))
+        api_result.raise_for_status()
         return cls.build(api_result.json()["data"])
+
+    def refresh(self) -> Self:
+        api_result = client.get(PATHS.waypoint(symbol=self.symbol))
+        api_result.raise_for_status()
+        return self.build(api_result.json()["data"])

@@ -64,10 +64,24 @@ def waypoint(symbol):
     pprint(result)
 
 
+@click.command()
+@click.argument("symbol")
+def system_waypoints(symbol):
+    """
+    Return SystemWaypoints information
+    """
+    from src.schemas import SystemWaypoints
+    from rich.pretty import pprint
+
+    result = SystemWaypoints.get(symbol=symbol)
+    pprint(result)
+
+
 cli_group.add_command(test_api_connectivity)
 cli_group.add_command(me)
 cli_group.add_command(contracts)
 cli_group.add_command(waypoint)
+cli_group.add_command(system_waypoints)
 
 if __name__ == "__main__":
     cli_group()

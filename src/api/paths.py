@@ -22,6 +22,14 @@ class Paths:
         waypoint = symbol
         return f"{BASE_PATH}/systems/{system}/waypoints/{waypoint}"
 
+    def system_waypoints(self, symbol: str) -> str:
+        """
+        Generate the API path for system_waypoints.
+        """
+        parts = symbol.split("-")
+        system = "-".join(parts[:2])
+        return f"{BASE_PATH}/systems/{system}/waypoints"
+
     def accept_contract(self, contract_id: str) -> str:
         """
         Generate the API path for accepting a contract.
