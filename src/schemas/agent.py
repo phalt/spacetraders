@@ -27,4 +27,4 @@ class Agent:
         return cls(**api_response.json()["data"])
 
     def headquarters_info(self) -> Waypoint:
-        return Waypoint.get(self.symbol)
+        return Waypoint.get(self.headquarters)

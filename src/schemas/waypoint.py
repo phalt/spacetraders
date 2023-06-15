@@ -1,6 +1,9 @@
 from typing import List, Dict, Self
 import attrs
 
+from cachetools import cached
+
+from src.settings import cache
 from src.api import client, PATHS
 
 
@@ -42,12 +45,12 @@ class Waypoint:
     @classmethod
     def build(cls, data: Dict) -> Self:
         orbitals = [Orbital(**x) for x in data.pop("orbitals")]
-        traits = ([Trait(**x) for x in data.pop("traits")],)
+        traits = [Trait(**x) for x in data.pop("traits")]
 
         return cls(**data, orbitals=orbitals, traits=traits)
 
-    @staticmethod
-    def get(symbol: str) -> Self:
-        print(PATHS.waypoint(symbol=symbol))
+    @classmethod
+    @cached(cache)
+    def get(cls, symbol: str) -> Self:
         api_result = client.get(PATHS.waypoint(symbol=symbol))
-        return Waypoint.build(api_result.json()["data"])
+        return cls.build(api_result.json()["data"])

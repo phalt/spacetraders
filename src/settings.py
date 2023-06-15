@@ -2,13 +2,15 @@ from configparser import ConfigParser
 from os.path import abspath, dirname, join
 from typing import Any, List
 
+from cachetools import TTLCache
+
 from structlog import get_logger
 
 log = get_logger(name=__name__)
 
 CONFIG_ROOT = dirname(dirname(abspath(__file__)))
 
-log.info(str(CONFIG_ROOT))
+log.info(f"config_root={str(CONFIG_ROOT)}")
 
 
 class SpaceTradersConfig(ConfigParser):
@@ -36,4 +38,23 @@ class SpaceTradersConfig(ConfigParser):
         return files
 
 
+class SpaceTradersCache:
+    def __init__(self):
+        self.cache = {}
+
+    def get(self, key):
+        return self.cache.get(key)
+
+    def set(self, key, value):
+        self.cache[key] = value
+
+    def delete(self, key):
+        if key in self.cache:
+            del self.cache[key]
+
+    def clear(self):
+        self.cache.clear()
+
+
 config = SpaceTradersConfig(config_path=CONFIG_ROOT)
+cache: TTLCache = TTLCache(maxsize=64, ttl=60)
