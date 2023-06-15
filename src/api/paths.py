@@ -13,7 +13,7 @@ class Paths:
     AGENT: str = f"{BASE_PATH}/my/agent"
     CONTRACTS: str = f"{BASE_PATH}/my/contracts"
 
-    def waypoint(self, symbol) -> str:
+    def waypoint(self, symbol: str) -> str:
         """
         Generate the API path for a waypoint.
         """
@@ -21,6 +21,12 @@ class Paths:
         system = "-".join(parts[:2])
         waypoint = symbol
         return f"{BASE_PATH}/systems/{system}/waypoints/{waypoint}"
+
+    def accept_contract(self, contract_id: str) -> str:
+        """
+        Generate the API path for accepting a contract.
+        """
+        return f"{BASE_PATH}/my/contracts/{contract_id}/accept"
 
 
 PATHS = Paths()

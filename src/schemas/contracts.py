@@ -3,6 +3,10 @@ import attrs
 
 from src.api import client, PATHS
 
+from structlog import get_logger
+
+log = get_logger(__name__)
+
 
 @attrs.define
 class Term:
@@ -43,6 +47,12 @@ class Contract:
         assert (
             self.accepted is False
         ), "Cannot accept a contract that is already accepted!"
+
+        result = client.post(PATHS.accept_contract(self.id))
+        result.raise_for_status()
+        log.info(f"Accepted contract {self.id}")
+        log.info(result.json())
+        self.accepted = True
 
 
 @attrs.define
