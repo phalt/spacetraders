@@ -158,3 +158,13 @@ class ShipsManager:
         return cls(
             total=meta["total"], page=meta["page"], limit=meta["limit"], ships=ships
         )
+
+    @staticmethod
+    def buy_ship(ship_type: str, waypoint_symbol: str) -> Ship:
+        """
+        Purchase a ship
+        """
+        post_data = dict(shipType=ship_type, waypointSymbol=waypoint_symbol)
+        api_result = client.post(PATHS.SHIPS, data=post_data)
+        api_result.raise_for_status()
+        return Ship(**api_result.json()["ship"])
