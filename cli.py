@@ -91,6 +91,18 @@ def ship(symbol):
 
 
 @click.command()
+def ships():
+    """
+    Return all ship information
+    """
+    from src.schemas import ShipsManager
+    from rich.pretty import pprint
+
+    result = ShipsManager.all()
+    pprint(result)
+
+
+@click.command()
 @click.argument("symbol")
 def system_waypoints(symbol):
     """
@@ -109,6 +121,7 @@ cli_group.add_command(contracts)
 cli_group.add_command(waypoint)
 cli_group.add_command(shipyard)
 cli_group.add_command(ship)
+cli_group.add_command(ships)
 cli_group.add_command(system_waypoints)
 
 if __name__ == "__main__":
