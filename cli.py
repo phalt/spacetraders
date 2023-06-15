@@ -66,6 +66,19 @@ def waypoint(symbol):
 
 @click.command()
 @click.argument("symbol")
+def shipyard(symbol):
+    """
+    Return Shipyard information
+    """
+    from src.schemas import Shipyard
+    from rich.pretty import pprint
+
+    result = Shipyard.get(symbol=symbol)
+    pprint(result)
+
+
+@click.command()
+@click.argument("symbol")
 def system_waypoints(symbol):
     """
     Return SystemWaypoints information
@@ -81,6 +94,7 @@ cli_group.add_command(test_api_connectivity)
 cli_group.add_command(me)
 cli_group.add_command(contracts)
 cli_group.add_command(waypoint)
+cli_group.add_command(shipyard)
 cli_group.add_command(system_waypoints)
 
 if __name__ == "__main__":

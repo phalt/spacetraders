@@ -13,15 +13,6 @@ class Paths:
     AGENT: str = f"{BASE_PATH}/my/agent"
     CONTRACTS: str = f"{BASE_PATH}/my/contracts"
 
-    def waypoint(self, symbol: str) -> str:
-        """
-        Generate the API path for a waypoint.
-        """
-        parts = symbol.split("-")
-        system = "-".join(parts[:2])
-        waypoint = symbol
-        return f"{BASE_PATH}/systems/{system}/waypoints/{waypoint}"
-
     def system_waypoints(self, symbol: str) -> str:
         """
         Generate the API path for system_waypoints.
@@ -29,6 +20,19 @@ class Paths:
         parts = symbol.split("-")
         system = "-".join(parts[:2])
         return f"{BASE_PATH}/systems/{system}/waypoints"
+
+    def waypoint(self, symbol: str) -> str:
+        """
+        Generate the API path for a waypoint.
+        """
+        waypoint = symbol
+        return f"{self.system_waypoints(symbol=symbol)}/{waypoint}"
+
+    def shipyard(self, symbol: str) -> str:
+        """
+        Generate the API path for a shipyard
+        """
+        return f"{self.waypoint(symbol=symbol)}/shipyard"
 
     def accept_contract(self, contract_id: str) -> str:
         """
