@@ -270,7 +270,7 @@ class ShipsManager:
     @classmethod
     @cached(cache)
     def all(cls) -> Self:
-        api_result = client.get(PATHS.SHIPS)
+        api_result = client.get(PATHS.MY_SHIPS)
         api_result.raise_for_status()
         meta = api_result.json()["meta"]
         ships = [Ship(**d) for d in api_result.json()["data"]]
@@ -284,7 +284,7 @@ class ShipsManager:
         Purchase a ship
         """
         post_data = dict(shipType=ship_type, waypointSymbol=waypoint_symbol)
-        api_result = client.post(PATHS.SHIPS, data=post_data)
+        api_result = client.post(PATHS.MY_SHIPS, data=post_data)
         result = data_or_error(api_result)
         match result:
             case dict():

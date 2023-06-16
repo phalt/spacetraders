@@ -12,9 +12,11 @@ class Paths:
     """
 
     REGISTER: str = f"{BASE_PATH}/register"
-    AGENT: str = f"{BASE_PATH}/my/agent"
-    SHIPS: str = f"{BASE_PATH}/my/ships"
-    CONTRACTS: str = f"{BASE_PATH}/my/contracts"
+    MY_AGENT: str = f"{BASE_PATH}/my/agent"
+    MY_SHIPS: str = f"{BASE_PATH}/my/ships"
+    MY_CONTRACTS: str = f"{BASE_PATH}/my/contracts"
+    MY_FACTIONS: str = f"{BASE_PATH}/my/factions"
+    FACTIONS: str = f"{BASE_PATH}/factions"
 
     def ship(self, symbol: str) -> str:
         """
@@ -97,11 +99,17 @@ class Paths:
         """
         return f"{self.waypoint(symbol=symbol)}/market"
 
-    def accept_contract(self, contract_id: str) -> str:
+    def contract_accept(self, contract_id: str) -> str:
         """
         Generate the API path for accepting a contract.
         """
         return f"{BASE_PATH}/my/contracts/{contract_id}/accept"
+
+    def contract_deliver(self, contract_id: str) -> str:
+        """
+        Generate the API path for delivering on a contract.
+        """
+        return f"{BASE_PATH}/my/contracts/{contract_id}/deliver"
 
 
 PATHS = Paths()

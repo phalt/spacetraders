@@ -27,7 +27,7 @@ class Agent:
         """
         Returns the "you" version of an Agent
         """
-        api_response = client.get(PATHS.AGENT)
+        api_response = client.get(PATHS.MY_AGENT)
         api_response.raise_for_status()
         return cls(**api_response.json()["data"])
 
