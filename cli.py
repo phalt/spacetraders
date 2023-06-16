@@ -182,9 +182,9 @@ def status(depth):
     You must have a ship docked at this waypoint to purchase.
     """
     from rich.pretty import pprint
-    from src.api import client, PATHS
+    from src.api import bare_client, PATHS
 
-    result = client.get(PATHS.SERVER_STATUS)
+    result = bare_client.get(PATHS.SERVER_STATUS)
     pprint(result.json(), max_depth=int(depth))
 
 
