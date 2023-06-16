@@ -11,6 +11,7 @@ class Paths:
     Generated paths should be functions.
     """
 
+    SERVER_STATUS: str = BASE_PATH
     REGISTER: str = f"{BASE_PATH}/register"
     MY_AGENT: str = f"{BASE_PATH}/my/agent"
     MY_SHIPS: str = f"{BASE_PATH}/my/ships"
