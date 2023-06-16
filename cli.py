@@ -98,15 +98,36 @@ def shipyard(symbol, depth):
 @click.command()
 @click.argument("symbol")
 @click.argument("depth", default=1)
-def ship(symbol, depth):
+def market(symbol, depth):
+    """
+    Return Market information
+    """
+    from src.schemas import Market
+    from rich.pretty import pprint
+
+    result = Market.get(symbol=symbol)
+    pprint(result, max_depth=int(depth))
+
+
+@click.command()
+@click.argument("symbol")
+@click.argument("content", required=False)
+@click.argument("depth", default=1)
+def ship(symbol, content, depth):
     """
     Return Ship information
+    Second argument determines content
     """
     from src.schemas import Ship
     from rich.pretty import pprint
-
-    result = Ship.get(symbol=symbol)
-    pprint(result, max_depth=int(depth))
+    ship = Ship.get(symbol=symbol)
+    if content == 'cargo':
+        pprint(ship.cargo_status(), max_depth=int(depth))
+    if content == 'nav':
+        pprint(ship.navigation_status(), max_depth=int(depth))
+    else:
+        content = content or 1
+        pprint(ship, max_depth=int(content))
 
 
 @click.command()
@@ -157,6 +178,7 @@ cli_group.add_command(me)
 cli_group.add_command(contracts)
 cli_group.add_command(waypoint)
 cli_group.add_command(shipyard)
+cli_group.add_command(market)
 cli_group.add_command(ship)
 cli_group.add_command(ships)
 cli_group.add_command(buy_ship)
