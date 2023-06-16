@@ -1,9 +1,7 @@
 from typing import List, Self
 import attrs
 
-from cachetools import cached
 
-from src.settings import cache
 from src.api import client, PATHS
 from .waypoint import Waypoint
 
@@ -16,7 +14,6 @@ class SystemWaypoints:
     waypoints: List[Waypoint]
 
     @classmethod
-    @cached(cache)
     def get(cls, symbol: str) -> Self:
         api_response = client.get(PATHS.system_waypoints(symbol=symbol))
         api_response.raise_for_status()

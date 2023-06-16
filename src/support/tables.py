@@ -1,9 +1,22 @@
-from typing import TypeVar, Type, Iterable
+from typing import TypeVar, Type, Iterable, Any
 from decimal import Decimal
 import attrs
 from rich.table import Table
 
+from src.schemas.errors import Error
+
 X = TypeVar("X")
+
+
+def report_result(result, HappyClass: Any, console):
+    """
+    Prints out different tables based on the result.
+    """
+    match result:
+        case Error():
+            console.print(attrs_to_rich_table(Error, [result]))
+        case HappyClass():
+            console.print(attrs_to_rich_table(HappyClass, [result]))
 
 
 def attrs_to_rich_table(row_type: Type[X], rows: Iterable[X]) -> Table:

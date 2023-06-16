@@ -1,20 +1,22 @@
 from typing import List
 from rich.console import Console
-from src.logic.actions.ships import ShowShipCargoStatus
+from src.logic.actions.ships import ShipNavigate
 from src.logic.actions.agents import ShowAgentStatus
 
 from time import sleep
 
-INIT_ACTIONS = [ShowAgentStatus(), ShowShipCargoStatus()]
+INIT_ACTIONS = [ShowAgentStatus()]
 
-AUTOMATION_ACTIONS: List = []
+AUTOMATION_ACTIONS: List = [
+    ShipNavigate(symbol="HALLETT-7", destination="X1-KS52-51225B")
+]
 
 
 def main():
     "The main automation loop"
     console = Console()
     with console.status("Launching to space... :star:"):
-        sleep(2)
+        sleep(1)
 
     for action in INIT_ACTIONS:
         console.rule(action.name)

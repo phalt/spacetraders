@@ -1,12 +1,10 @@
 import attrs
-from rich.table import Table
-from rich.console import Console
 from time import sleep
+from rich.console import Console
 
 from src.schemas import Ship, ShipsManager, Nav, Cargo
-from src.schemas.errors import Error
 
-from src.support.tables import attrs_to_rich_table
+from src.support.tables import attrs_to_rich_table, report_result
 
 
 @attrs.define
@@ -19,16 +17,29 @@ class ShipNavigate:
         return f"Ship {self.symbol} navigate to {self.destination}"
 
     def sleep(self):
-        pass
+        sleep(20)
 
     def process(self):
+        console = Console()
         ship = Ship.get(symbol=self.symbol)
+        if (
+            ship.nav.waypointSymbol == self.destination
+            and ship.nav.status != "IN_TRANSIT"
+        ):
+            console.print(f"Ship {ship.symbol} has arrived at {self.destination}")
+            if ship.nav.status == "IN_ORBIT":
+                console.print("Ship is in orbit, docking...")
+                result = ship.dock()
+                report_result(result=result, HappyClass=Nav, console=console)
+        if ship.nav.status == "DOCKED":
+            console.print("Ship is docked, going to orbit...")
+            result = ship.orbit()
+            report_result(result=result, HappyClass=Nav, console=console)
+        console.print(
+            f"Ship is at {ship.nav.waypointSymbol}, navigating to {self.destination}..."
+        )
         result = ship.navigate(waypoint=self.destination)
-        match result:
-            case Error():
-                print(Error)
-            case Nav():
-                Table()
+        report_result(result=result, HappyClass=Nav, console=console)
 
 
 class ShowShipCargoStatus:

@@ -1,9 +1,6 @@
 from typing import List, Dict, Self, Optional, Any, Union, TYPE_CHECKING
 import attrs
 
-from cachetools import cached
-
-from src.settings import cache
 from src.api import client, PATHS
 from src.api.utils import data_or_error
 
@@ -142,7 +139,6 @@ class Ship:
         )
 
     @classmethod
-    @cached(cache)
     def get(cls, symbol: str) -> Self:
         api_result = client.get(url=PATHS.ship(symbol=symbol))
         api_result.raise_for_status()
@@ -268,7 +264,6 @@ class ShipsManager:
     ships: List[Ship]
 
     @classmethod
-    @cached(cache)
     def all(cls) -> Self:
         api_result = client.get(PATHS.MY_SHIPS)
         api_result.raise_for_status()

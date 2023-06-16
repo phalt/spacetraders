@@ -1,9 +1,6 @@
 from typing import List, Dict, Self, Optional, Union, Any
 import attrs
 
-from cachetools import cached
-
-from src.settings import cache
 from src.api import client, PATHS
 
 
@@ -55,7 +52,6 @@ class Waypoint:
         return cls(**data, orbitals=orbitals, traits=traits)
 
     @classmethod
-    @cached(cache)
     def get(cls, symbol: str) -> Self:
         api_result = client.get(PATHS.waypoint(symbol=symbol))
         api_result.raise_for_status()
@@ -84,7 +80,6 @@ class Shipyard:
         return cls(**data)
 
     @classmethod
-    @cached(cache)
     def get(cls, symbol: str) -> Self:
         api_result = client.get(PATHS.shipyard(symbol=symbol))
         api_result.raise_for_status()

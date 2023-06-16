@@ -1,10 +1,6 @@
 from typing import List, Dict, Self, Union
 import attrs
 
-from cachetools import cached
-
-from src.settings import cache
-
 from .transactions import Transaction
 from src.api import client, PATHS
 from src.api.utils import data_or_error
@@ -53,7 +49,6 @@ class Market:
         )
 
     @classmethod
-    @cached(cache)
     def get(cls, symbol: str) -> Union[Self, Error]:
         api_response = client.get(PATHS.market(symbol=symbol))
         result = data_or_error(api_response=api_response)
