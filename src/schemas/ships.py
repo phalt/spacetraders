@@ -14,7 +14,7 @@ from .mining import Extraction
 from .generic import Cooldown
 
 if TYPE_CHECKING:
-    from .agent import Agent
+    pass
 
 
 @attrs.define
@@ -156,7 +156,7 @@ class Ship:
                 return Nav(**result)
             case _:
                 return result
-            
+
     def cargo_status(self) -> Union[Cargo, Error]:
         api_response = client.get(PATHS.ship_cargo(self.symbol))
         result = data_or_error(api_response=api_response)
@@ -165,7 +165,7 @@ class Ship:
                 return Cargo(**result)
             case _:
                 return result
-            
+
     def navigate(self, waypoint: str) -> Union[Nav, Error]:
         """
         Navigate to a waypoint.
@@ -221,7 +221,7 @@ class Ship:
                 )
             case _:
                 return result
-            
+
     def extract(self) -> Union[Dict, Error]:
         """
         Perform mining extraction at the current waypoint.
@@ -230,11 +230,31 @@ class Ship:
         result = data_or_error(api_response=api_response)
         match result:
             case dict():
-                yield_ = result['extraction'].pop('yield')
+                yield_ = result["extraction"].pop("yield")
                 return dict(
                     extraction=Extraction(**result["extraction"], yield_=yield_),
                     cooldown=Cooldown(**result["cooldown"]),
                     cargo=Cargo(**result["cargo"]),
+                )
+            case _:
+                return result
+
+    def sell(self, symbol: str, amount: int) -> Union[Dict, Error]:
+        """
+        Sell some items in cargo.
+        """
+        from .agent import Agent
+
+        api_response = client.post(
+            PATHS.ship_sell(self.symbol), data={"symbol": symbol, "units": amount}
+        )
+        result = data_or_error(api_response=api_response)
+        match result:
+            case dict():
+                return dict(
+                    agent=Agent(**result["agent"]),
+                    cargo=Cargo(**result["cargo"]),
+                    transaction=Transaction(**result["transaction"]),
                 )
             case _:
                 return result

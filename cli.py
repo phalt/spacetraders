@@ -120,10 +120,11 @@ def ship(symbol, content, depth):
     """
     from src.schemas import Ship
     from rich.pretty import pprint
+
     ship = Ship.get(symbol=symbol)
-    if content == 'cargo':
+    if content == "cargo":
         pprint(ship.cargo_status(), max_depth=int(depth))
-    if content == 'nav':
+    elif content == "nav":
         pprint(ship.navigation_status(), max_depth=int(depth))
     else:
         content = content or 1

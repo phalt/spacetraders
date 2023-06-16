@@ -10,6 +10,7 @@ from src.api import client, PATHS
 from src.api.utils import data_or_error
 from .errors import Error
 
+
 @attrs.define
 class TradeGood:
     symbol: str
@@ -17,6 +18,7 @@ class TradeGood:
     supply: str
     purchasePrice: int
     sellPrice: int
+
 
 @attrs.define
 class Commodity:
@@ -39,8 +41,8 @@ class Market:
         market_imports = [Commodity(**x) for x in data["imports"]]
         market_exports = [Commodity(**x) for x in data["exports"]]
         exchange = [Commodity(**x) for x in data["exchange"]]
-        transactions = [Transaction(**x) for x in data['transactions']]
-        trade_goods = [TradeGood(**x) for x in data['tradeGoods']]
+        transactions = [Transaction(**x) for x in data["transactions"]]
+        trade_goods = [TradeGood(**x) for x in data["tradeGoods"]]
         return cls(
             symbol=data["symbol"],
             marketImports=market_imports,
@@ -49,7 +51,7 @@ class Market:
             transactions=transactions,
             tradeGoods=trade_goods,
         )
-    
+
     @classmethod
     @cached(cache)
     def get(cls, symbol: str) -> Union[Self, Error]:

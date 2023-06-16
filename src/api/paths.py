@@ -27,7 +27,7 @@ class Paths:
         API path for ship nav status
         """
         return f"{self.ship(symbol=symbol)}/nav"
-    
+
     def ship_cargo(self, symbol: str) -> str:
         """
         API path for ship cargo status
@@ -57,7 +57,13 @@ class Paths:
         API path to refuel ship
         """
         return f"{self.ship(symbol=symbol)}/refuel"
-    
+
+    def ship_sell(self, symbol: str) -> str:
+        """
+        API path to sell stuff
+        """
+        return f"{self.ship(symbol=symbol)}/sell"
+
     def ship_extract(self, symbol: str) -> str:
         """
         API path to perform mining extraction
@@ -84,7 +90,7 @@ class Paths:
         Generate the API path for a shipyard
         """
         return f"{self.waypoint(symbol=symbol)}/shipyard"
-    
+
     def market(self, symbol: str) -> str:
         """
         Generate the API path for a market

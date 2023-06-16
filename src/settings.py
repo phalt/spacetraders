@@ -10,8 +10,6 @@ log = get_logger(name=__name__)
 
 CONFIG_ROOT = dirname(dirname(abspath(__file__)))
 
-log.info(f"config_root={str(CONFIG_ROOT)}")
-
 
 class SpaceTradersConfig(ConfigParser):
     """
