@@ -1,8 +1,34 @@
+import attrs
 from rich.table import Table
 from rich.console import Console
 from time import sleep
 
-from src.schemas import ShipsManager
+from src.schemas import Ship, ShipsManager, Nav, Cargo
+from src.schemas.errors import Error
+
+from src.support.tables import attrs_to_rich_table
+
+
+@attrs.define
+class ShipNavigate:
+    symbol: str
+    destination: str
+
+    @property
+    def name(self) -> str:
+        return f"Ship {self.symbol} navigate to {self.destination}"
+
+    def sleep(self):
+        pass
+
+    def process(self):
+        ship = Ship.get(symbol=self.symbol)
+        result = ship.navigate(waypoint=self.destination)
+        match result:
+            case Error():
+                print(Error)
+            case Nav():
+                Table()
 
 
 class ShowShipCargoStatus:
@@ -18,21 +44,5 @@ class ShowShipCargoStatus:
         ships = ShipsManager.all()
         console = Console()
         for ship in ships.ships:
-            # Info table
-            cargo_info_table = Table(title="Capacity")
-            cargo_info_table.add_column("capacity")
-            cargo_info_table.add_column("units")
-            cargo_info_table.add_row(
-                str(ship.cargo["capacity"]), str(ship.cargo["units"])
-            )
-            # Contents table
-            contents_table = Table(title="Contents")
-            contents_table.add_column("symbol")
-            contents_table.add_column("units")
-            cargo = ship.cargo_status()
-            for row in cargo.inventory:
-                contents_table.add_row(row["symbol"], row["units"])
-            console.rule(f"[bold red]Cargo - {ship.symbol}")
-            console.print(cargo_info_table, justify="left", end="")
-            console.print(contents_table, justify="center")
-            sleep(2)
+            console.print(f":package: Cargo for {ship.symbol}", emoji=True)
+            console.print(attrs_to_rich_table(Cargo, [ship.cargo]))

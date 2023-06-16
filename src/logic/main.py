@@ -22,7 +22,9 @@ def main():
         action.sleep()
 
     while True:
-        print(":counterclockwise_arrows_button:")
+        if not AUTOMATION_ACTIONS:
+            break
+        console.print(":counterclockwise_arrows_button:", emoji=True)
         for action in AUTOMATION_ACTIONS:
             console.rule(action.name)
             action.process()

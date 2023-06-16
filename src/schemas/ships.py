@@ -273,7 +273,7 @@ class ShipsManager:
         api_result = client.get(PATHS.MY_SHIPS)
         api_result.raise_for_status()
         meta = api_result.json()["meta"]
-        ships = [Ship(**d) for d in api_result.json()["data"]]
+        ships = [Ship.build(d) for d in api_result.json()["data"]]
         return cls(
             total=meta["total"], page=meta["page"], limit=meta["limit"], ships=ships
         )
