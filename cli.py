@@ -188,6 +188,16 @@ def status(depth):
     pprint(result.json(), max_depth=int(depth))
 
 
+@click.command()
+def loop():
+    """
+    Begin the automation loop.
+    """
+    from src.logic.main import main
+
+    main()
+
+
 cli_group.add_command(register)
 cli_group.add_command(me)
 cli_group.add_command(contracts)
@@ -199,6 +209,6 @@ cli_group.add_command(ships)
 cli_group.add_command(buy_ship)
 cli_group.add_command(system_waypoints)
 cli_group.add_command(status)
-
+cli_group.add_command(loop)
 if __name__ == "__main__":
     cli_group()

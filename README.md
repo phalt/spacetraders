@@ -24,3 +24,17 @@ Test run the application:
 ```sh
 make test_api
 ```
+
+## Automation
+
+Most of the game loop can be found in the `src/logic/` directory.
+I'e tried to standardise "actions" to perform so you can build up a list of actions
+and run it.
+
+You can run the automation like this:
+
+```sh
+make automate
+``
+
+Worth noting that in the automation stack things are async.

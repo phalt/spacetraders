@@ -27,3 +27,6 @@ shell:  ## Run an ipython shell
 
 query:  ## Run various queries against the CLI file. Use like `make query q="me"`
 	poetry run python cli.py $(q)
+
+automate:  ## Run the automation loop
+	poetry run python cli.py loop
