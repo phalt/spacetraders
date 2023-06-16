@@ -48,10 +48,10 @@ def me():
     Return Agent details about yourself
     """
     from src.schemas import Agent
-    from rich.pretty import pprint
+    from src.support.tables import report_result
 
     result = Agent.me()
-    pprint(result)
+    report_result(result, Agent)
 
 
 @click.command()
@@ -112,36 +112,33 @@ def market(symbol, depth):
 @click.command()
 @click.argument("symbol")
 @click.argument("content", required=False)
-@click.argument("depth", default=1)
-def ship(symbol, content, depth):
+def ship(symbol, content):
     """
     Return Ship information
     Second argument determines content
     """
-    from src.schemas import Ship
-    from rich.pretty import pprint
+    from src.schemas import Ship, Cargo, Nav
+    from src.support.tables import report_result
 
     ship = Ship.get(symbol=symbol)
     if content == "cargo":
-        pprint(ship.cargo_status(), max_depth=int(depth))
+        report_result(ship.cargo_status(), Cargo)
     elif content == "nav":
-        pprint(ship.navigation_status(), max_depth=int(depth))
+        report_result(ship.navigation_status(), Nav)
     else:
-        content = content or 1
-        pprint(ship, max_depth=int(content))
+        report_result(ship, Ship)
 
 
 @click.command()
-@click.argument("depth", default=1)
-def ships(depth):
+def ships():
     """
     Return all ship information
     """
     from src.schemas import ShipsManager
-    from rich.pretty import pprint
+    from src.support.tables import report_result
 
     result = ShipsManager.all()
-    pprint(result, max_depth=int(depth))
+    report_result(result, ShipsManager)
 
 
 @click.command()

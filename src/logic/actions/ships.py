@@ -30,16 +30,16 @@ class ShipNavigate:
             if ship.nav.status == "IN_ORBIT":
                 console.print("Ship is in orbit, docking...")
                 result = ship.dock()
-                report_result(result=result, HappyClass=Nav, console=console)
+                report_result(result=result, HappyClass=Nav)
         if ship.nav.status == "DOCKED":
             console.print("Ship is docked, going to orbit...")
             result = ship.orbit()
-            report_result(result=result, HappyClass=Nav, console=console)
+            report_result(result=result, HappyClass=Nav)
         console.print(
             f"Ship is at {ship.nav.waypointSymbol}, navigating to {self.destination}..."
         )
         result = ship.navigate(waypoint=self.destination)
-        report_result(result=result, HappyClass=Nav, console=console)
+        report_result(result=result, HappyClass=Nav)
 
 
 class ShowShipCargoStatus:
