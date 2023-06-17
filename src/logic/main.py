@@ -28,5 +28,9 @@ def main():
             action.sleep()
 
 
-if __name__ == "__main__":
-    main()
+def mining_loop(ship_symbol, destination):
+    action = MiningLoop(symbol=ship_symbol, destination=destination)
+    console = Console()
+    while True:
+        console.rule(action.name)
+        action.process()

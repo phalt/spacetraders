@@ -30,3 +30,6 @@ query:  ## Run various queries against the CLI file. Use like `make query q="me"
 
 automate:  ## Run the automation loop
 	poetry run python cli.py loop
+
+mining_loop:  ## Set a specific ship on a mining loop
+	poetry run python cli.py mining-loop $(q)

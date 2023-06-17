@@ -195,6 +195,18 @@ def loop():
     main()
 
 
+@click.command()
+@click.argument("ship_symbol")
+@click.argument("destination")
+def mining_loop(ship_symbol, destination):
+    """
+    Set a ship on the mining loop automation script.
+    """
+    from src.logic.main import mining_loop
+
+    mining_loop(ship_symbol, destination)
+
+
 cli_group.add_command(register)
 cli_group.add_command(me)
 cli_group.add_command(contracts)
@@ -207,5 +219,7 @@ cli_group.add_command(buy_ship)
 cli_group.add_command(system_waypoints)
 cli_group.add_command(status)
 cli_group.add_command(loop)
+cli_group.add_command(mining_loop)
+
 if __name__ == "__main__":
     cli_group()
