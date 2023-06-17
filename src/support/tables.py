@@ -17,7 +17,7 @@ def report_result(result, HappyClass: Any):
     match result:
         case Error():
             console.print(attrs_to_rich_table(Error, [result]))
-        case HappyClass():
+        case _:
             console.print(attrs_to_rich_table(HappyClass, [result]))
 
 
