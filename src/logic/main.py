@@ -21,10 +21,11 @@ def main():
         action.process()
         action.sleep()
 
-    for action in AUTOMATION_ACTIONS:
-        console.rule(action.name)
-        action.process()
-        action.sleep()
+    while True:
+        for action in AUTOMATION_ACTIONS:
+            console.rule(action.name)
+            action.process()
+            action.sleep()
 
 
 if __name__ == "__main__":

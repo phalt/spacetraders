@@ -99,9 +99,7 @@ class MiningLoop:
         """
         ship.dock()
         cargo = ship.cargo_status()
-        items_units = [
-            (x['symbol'], x['units']) for x in cargo.inventory
-        ]
+        items_units = [(x["symbol"], x["units"]) for x in cargo.inventory]
         self.console.print(f"Total cargo to sell: {items_units}")
         for symbol, units in items_units:
             self.console.log(f"Selling {symbol}...")
@@ -109,11 +107,10 @@ class MiningLoop:
             if isinstance(result, Error):
                 report_result(result, Ship)
             else:
-                transaction = result['transaction']
+                transaction = result["transaction"]
                 report_result(transaction, Transaction)
-                self.sell_total +=  transaction.totalPrice
+                self.sell_total += transaction.totalPrice
         return ship
-
 
     def process(self):
         ship = Ship.get(symbol=self.symbol)
