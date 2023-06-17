@@ -76,12 +76,13 @@ class MiningLoop:
             return ship
 
         self.console.print("Mining...")
-        while cargo_status.units <= cargo_status.capacity:
+        while cargo_status.units < cargo_status.capacity:
             result = ship.extract()
             if isinstance(result, Error):
                 report_result(result, Extraction)
-                cooldown = result.data["cooldown"]
-                sleep(cooldown["remainingSeconds"])
+                cooldown = result.data.get("cooldown")
+                if cooldown:
+                    sleep(cooldown["remainingSeconds"])
             else:
                 report_result(result["extraction"], Extraction)
                 cooldown = result["cooldown"].remainingSeconds
