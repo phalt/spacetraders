@@ -2,7 +2,9 @@ import attrs
 from time import sleep
 from rich.console import Console
 
-from src.schemas import Ship, Extraction, Cargo, Transaction
+from src.schemas.ships import Ship, Cargo
+from src.schemas.mining import Extraction
+from src.schemas.transactions import Transaction
 from src.schemas.errors import Error
 from src.support.tables import report_result
 from .ships import AbstractShipNavigate
@@ -13,8 +15,8 @@ class MiningLoop(AbstractShipNavigate):
     ship_symbol: str
     destination: str
     console: Console = Console()
-    fuel_cost: int = 0
     sell_total: int = 0
+    expenses: int = 0
 
     @property
     def name(self) -> str:
@@ -79,5 +81,5 @@ class MiningLoop(AbstractShipNavigate):
         ship = self.sell_cargo(ship)
 
         self.console.print(
-            f"Total earned from mining run = {self.sell_total - self.fuel_cost}"
+            f"Total earned from mining run = {self.sell_total - self.expenses}"
         )

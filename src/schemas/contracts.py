@@ -1,8 +1,7 @@
 from typing import Self, List, Dict, Union
 import attrs
 
-from src.api import client, PATHS
-from src.api.utils import data_or_error
+from src.api import client, PATHS, safe_post
 
 from .errors import Error
 from .ships import Cargo
@@ -52,24 +51,22 @@ class Contract:
             self.accepted is False
         ), "Cannot accept a contract that is already accepted!"
 
-        result = client.post(PATHS.contract_accept(self.id))
-        result.raise_for_status()
+        result = safe_post(path=PATHS.contract_accept(self.id))
         log.info(f"Accepted contract {self.id}")
-        log.info(result.json())
+        log.info(result)
         self.accepted = True
 
     def deliver(
         self, ship_symbol: str, trade_symbol: str, amount: int
     ) -> Union[Dict, Error]:
-        api_response = client.post(
-            PATHS.contract_deliver(self.id),
+        result = safe_post(
+            path=PATHS.contract_deliver(self.id),
             data={
                 "shipSymbol": ship_symbol,
                 "tradeSymbol": trade_symbol,
                 "units": amount,
             },
         )
-        result = data_or_error(api_response=api_response)
         match result:
             case dict():
                 return dict(

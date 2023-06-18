@@ -1,8 +1,7 @@
 from typing import List, Dict, Self, Union
 import attrs
 
-from src.api import client, PATHS
-from src.api.utils import data_or_error
+from src.api import PATHS, safe_get
 
 from .errors import Error
 
@@ -23,8 +22,7 @@ class FactionsManager:
 
     @classmethod
     def mine(cls) -> Union[Self, Error]:
-        api_response = client.get(PATHS.MY_FACTIONS)
-        result = data_or_error(api_response=api_response)
+        result = safe_get(path=PATHS.MY_FACTIONS)
         match result:
             case dict():
                 return cls(factions=[Faction(**x) for x in result])
@@ -33,8 +31,7 @@ class FactionsManager:
 
     @classmethod
     def all(cls) -> Union[Self, Error]:
-        api_response = client.get(PATHS.FACTIONS)
-        result = data_or_error(api_response=api_response)
+        result = safe_get(path=PATHS.FACTIONS)
         match result:
             case dict():
                 return cls(factions=[Faction(**x) for x in result])

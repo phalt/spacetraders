@@ -2,8 +2,7 @@ from typing import List, Dict, Self, Union
 import attrs
 
 from .transactions import Transaction
-from src.api import client, PATHS
-from src.api.utils import data_or_error
+from src.api import PATHS, safe_get
 from .errors import Error
 
 
@@ -50,8 +49,7 @@ class Market:
 
     @classmethod
     def get(cls, symbol: str) -> Union[Self, Error]:
-        api_response = client.get(PATHS.market(symbol=symbol))
-        result = data_or_error(api_response=api_response)
+        result = safe_get(path=PATHS.market(symbol=symbol))
         match result:
             case dict():
                 return cls.build(result)

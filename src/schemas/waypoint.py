@@ -1,7 +1,7 @@
 from typing import List, Dict, Self, Optional, Union, Any
 import attrs
 
-from src.api import client, PATHS
+from src.api import PATHS, safe_get
 
 
 @attrs.define
@@ -53,14 +53,12 @@ class Waypoint:
 
     @classmethod
     def get(cls, symbol: str) -> Self:
-        api_result = client.get(PATHS.waypoint(symbol=symbol))
-        api_result.raise_for_status()
-        return cls.build(api_result.json()["data"])
-
-    def refresh(self) -> Self:
-        api_result = client.get(PATHS.waypoint(symbol=self.symbol))
-        api_result.raise_for_status()
-        return self.build(api_result.json()["data"])
+        result = safe_get(path=PATHS.waypoint(symbol=symbol))
+        match result:
+            case dict():
+                return cls.build(result)
+            case _:
+                return result
 
 
 @attrs.define
@@ -81,6 +79,9 @@ class Shipyard:
 
     @classmethod
     def get(cls, symbol: str) -> Self:
-        api_result = client.get(PATHS.shipyard(symbol=symbol))
-        api_result.raise_for_status()
-        return cls.build(api_result.json()["data"])
+        result = safe_get(path=PATHS.shipyard(symbol=symbol))
+        match result:
+            case dict():
+                return cls.build(result)
+            case _:
+                return result

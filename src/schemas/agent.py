@@ -3,7 +3,7 @@ import attrs
 
 from .waypoint import Waypoint
 
-from src.api import client, PATHS, bare_client
+from src.api import PATHS, bare_client, safe_get
 from src.api.utils import data_or_error
 from .contracts import Contract
 from .ships import Ship
@@ -27,9 +27,12 @@ class Agent:
         """
         Returns the "you" version of an Agent
         """
-        api_response = client.get(PATHS.MY_AGENT)
-        api_response.raise_for_status()
-        return cls(**api_response.json()["data"])
+        result = safe_get(path=PATHS.MY_AGENT)
+        match result:
+            case dict():
+                return cls(**result)
+            case _:
+                return result
 
     def headquarters_info(self) -> Waypoint:
         return Waypoint.get(self.headquarters)

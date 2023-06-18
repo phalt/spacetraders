@@ -2,7 +2,7 @@ import attrs
 from time import sleep
 from rich.console import Console
 
-from src.schemas import Ship, ShipsManager, Nav, Cargo
+from src.schemas.ships import Ship, ShipsManager, Nav, Cargo
 
 from src.support.tables import attrs_to_rich_table, report_result
 

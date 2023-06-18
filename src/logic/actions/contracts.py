@@ -3,14 +3,10 @@ from time import sleep
 from rich.console import Console
 from rich.table import Table
 
-from src.schemas import (
-    Ship,
-    Extraction,
-    Cargo,
-    Transaction,
-    Contract,
-    ContractManager,
-)
+from src.schemas.ships import Ship, Cargo
+from src.schemas.mining import Extraction
+from src.schemas.transactions import Transaction
+from src.schemas.contracts import Contract, ContractManager
 from src.schemas.errors import Error
 from src.support.tables import report_result
 
@@ -124,7 +120,7 @@ class ContractMiningLoop(AbstractShipNavigate):
             return True
         else:
             self.console.print(
-                f"Only {contract_goods_in_cargo} {self.contract_good} and we want to sell at least {cargo_limit}..."
+                f"Got {contract_goods_in_cargo} / {cargo_limit} {self.contract_good}"
             )
             return False
 

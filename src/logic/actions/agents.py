@@ -1,6 +1,6 @@
 from rich.console import Console
 
-from src.schemas import Agent
+from src.schemas.agent import Agent
 from src.support.tables import attrs_to_rich_table
 
 

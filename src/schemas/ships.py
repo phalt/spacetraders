@@ -1,8 +1,7 @@
 from typing import List, Dict, Self, Optional, Any, Union, TYPE_CHECKING
 import attrs
 
-from src.api import client, PATHS
-from src.api.utils import data_or_error
+from src.api import client, PATHS, safe_get, safe_post
 
 from .nav import Nav
 from .errors import Error
@@ -139,14 +138,16 @@ class Ship:
         )
 
     @classmethod
-    def get(cls, symbol: str) -> Self:
-        api_result = client.get(url=PATHS.ship(symbol=symbol))
-        api_result.raise_for_status()
-        return cls.build(api_result.json()["data"])
+    def get(cls, symbol: str) -> Union[Self, Error]:
+        result = safe_get(path=PATHS.ship(symbol=symbol))
+        match result:
+            case dict():
+                return cls.build(result)
+            case _:
+                return result
 
     def navigation_status(self) -> Union[Nav, Error]:
-        api_response = client.get(PATHS.ship_nav(self.symbol))
-        result = data_or_error(api_response=api_response)
+        result = safe_get(path=PATHS.ship_nav(self.symbol))
         match result:
             case dict():
                 return Nav(**result)
@@ -154,8 +155,7 @@ class Ship:
                 return result
 
     def cargo_status(self) -> Union[Cargo, Error]:
-        api_response = client.get(PATHS.ship_cargo(self.symbol))
-        result = data_or_error(api_response=api_response)
+        result = safe_get(path=PATHS.ship_cargo(self.symbol))
         match result:
             case dict():
                 return Cargo(**result)
@@ -166,10 +166,9 @@ class Ship:
         """
         Navigate to a waypoint.
         """
-        api_response = client.post(
-            PATHS.ship_navigate(self.symbol), data={"waypointSymbol": waypoint}
+        result = safe_post(
+            path=PATHS.ship_navigate(self.symbol), data={"waypointSymbol": waypoint}
         )
-        result = data_or_error(api_response=api_response)
         match result:
             case dict():
                 return Nav(**result["nav"])
@@ -180,8 +179,7 @@ class Ship:
         """
         Put ship in orbit
         """
-        api_response = client.post(PATHS.ship_orbit(self.symbol))
-        result = data_or_error(api_response=api_response)
+        result = safe_post(path=PATHS.ship_orbit(self.symbol))
         match result:
             case dict():
                 return Nav(**result["nav"])
@@ -192,8 +190,7 @@ class Ship:
         """
         Dock ship
         """
-        api_response = client.post(PATHS.ship_dock(self.symbol))
-        result = data_or_error(api_response=api_response)
+        result = safe_post(path=PATHS.ship_dock(self.symbol))
         match result:
             case dict():
                 return Nav(**result["nav"])
@@ -206,8 +203,7 @@ class Ship:
         """
         from .agent import Agent
 
-        api_response = client.post(PATHS.ship_refuel(self.symbol))
-        result = data_or_error(api_response=api_response)
+        result = safe_post(path=PATHS.ship_refuel(self.symbol))
         match result:
             case dict():
                 return dict(
@@ -222,8 +218,7 @@ class Ship:
         """
         Perform mining extraction at the current waypoint.
         """
-        api_response = client.post(PATHS.ship_extract(self.symbol))
-        result = data_or_error(api_response=api_response)
+        result = safe_post(path=PATHS.ship_extract(self.symbol))
         match result:
             case dict():
                 yield_ = result["extraction"].pop("yield")
@@ -241,10 +236,9 @@ class Ship:
         """
         from .agent import Agent
 
-        api_response = client.post(
-            PATHS.ship_sell(self.symbol), data={"symbol": symbol, "units": amount}
+        result = safe_post(
+            path=PATHS.ship_sell(self.symbol), data={"symbol": symbol, "units": amount}
         )
-        result = data_or_error(api_response=api_response)
         match result:
             case dict():
                 return dict(
@@ -279,8 +273,7 @@ class ShipsManager:
         Purchase a ship
         """
         post_data = dict(shipType=ship_type, waypointSymbol=waypoint_symbol)
-        api_result = client.post(PATHS.MY_SHIPS, data=post_data)
-        result = data_or_error(api_result)
+        result = safe_post(path=PATHS.MY_SHIPS, data=post_data)
         match result:
             case dict():
                 return Ship(**result["ship"])
