@@ -124,8 +124,10 @@ def ship(symbol, content):
 
     ship = Ship.get(symbol=symbol)
     if content == "cargo":
+        pprint(f"{ship.symbol}")
         report_result(ship.cargo_status(), Cargo)
     elif content == "nav":
+        pprint(f"{ship.symbol}")
         report_result(ship.navigation_status(), Nav)
     else:
         pprint(ship, max_depth=int(content))
@@ -140,13 +142,18 @@ def ships(content):
     from src.schemas.ships import ShipsManager, Cargo, Nav
     from src.support.tables import report_result
     from rich.pretty import pprint
+    from rich.console import Console
+
+    console = Console()
 
     result = ShipsManager.all()
     if content == "cargo":
         for ship in result.ships:
+            console.rule(f"{ship.symbol}")
             report_result(ship.cargo_status(), Cargo)
     elif content == "nav":
         for ship in result.ships:
+            console.rule(f"{ship.symbol}")
             report_result(ship.navigation_status(), Nav)
     else:
         pprint(result, max_depth=int(content))

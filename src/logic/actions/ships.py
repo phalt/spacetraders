@@ -1,18 +1,109 @@
+from typing import List, Optional
 import attrs
 from time import sleep
 from rich.console import Console
+from rich.table import Table
+
+from collections import defaultdict
 
 from src.schemas.ships import Ship, ShipsManager, Nav, Cargo
-
+from src.schemas.errors import Error
+from src.schemas.mining import Extraction
+from src.schemas.transactions import Transaction
 from src.support.tables import attrs_to_rich_table, report_result
 
 
 @attrs.define
-class AbstractShipNavigate:
-    """
-    The best navigation functions to use.
-    """
+class AbstractMining:
+    def mine_until_cargo_full(self, ship: Ship) -> Ship:
+        ship.orbit()
+        cargo_status = ship.cargo_status()
+        match cargo_status:
+            case Error():
+                report_result(cargo_status, Cargo)
+            case Cargo():
+                if cargo_status.units == cargo_status.capacity:
+                    self.console.print("Cargo is full")
+                    report_result(cargo_status, Cargo)
+                    return ship
 
+                with self.console.status("mining until cargo full..."):
+                    mining_results = defaultdict(int)
+                    mining_table = Table(title="Mining results")
+                    mining_table.add_column("symbol")
+                    mining_table.add_column("yield")
+                    while cargo_status.units < cargo_status.capacity:
+                        result = ship.extract()
+                        match result:
+                            case Error():
+                                report_result(result, Extraction)
+                                cooldown = result.data.get("cooldown")
+                                if cooldown:
+                                    sleep(cooldown["remainingSeconds"])
+                            case dict():
+                                extraction: Extraction = result["extraction"]
+                                mining_results[
+                                    extraction.yield_["symbol"]
+                                ] += extraction.yield_["units"]
+                                cooldown = result["cooldown"].remainingSeconds
+                                sleep(cooldown)
+                        cargo_status = ship.cargo_status()
+                    for symbol, units in mining_results.items():
+                        mining_table.add_row(symbol, str(units))
+
+        self.console.print(mining_table)
+        return ship
+
+
+@attrs.define
+class AbstractSellCargo:
+    def sell_cargo(
+        self, ship: Ship, do_not_sell_symbols: Optional[List[str]] = []
+    ) -> Ship:
+        """
+        Sell all the contents of the cargo except trade good.
+        """
+        ship.dock()
+        cargo = ship.cargo_status()
+
+        match cargo:
+            case Error():
+                report_result(cargo, Cargo)
+            case Cargo():
+                with self.console.status("Selling cargo..."):
+                    this_cargo_sale = 0
+                    cargo_table = Table(title="Cargo sold")
+                    cargo_table.add_column("symbol")
+                    cargo_table.add_column("units")
+                    cargo_table.add_column("price per unit")
+                    cargo_table.add_column("total price")
+                    items_units = [
+                        (x["symbol"], x["units"])
+                        for x in cargo.inventory
+                        if x["symbol"] not in do_not_sell_symbols
+                    ]
+                    for symbol, units in items_units:
+                        result = ship.sell(symbol=symbol, amount=units)
+                        match result:
+                            case Error():
+                                report_result(result, Ship)
+                            case dict():
+                                transaction: Transaction = result["transaction"]
+                                cargo_table.add_row(
+                                    symbol,
+                                    str(units),
+                                    str(transaction.pricePerUnit),
+                                    str(transaction.totalPrice),
+                                )
+                                self.cargo_sales += transaction.totalPrice
+                                this_cargo_sale += transaction.totalPrice
+                self.console.print(cargo_table)
+                self.console.print(f"Total credits earned: {this_cargo_sale}")
+        return ship
+
+
+@attrs.define
+class AbstractShipNavigate:
     ship_symbol: str
     console: Console = Console()
 
@@ -24,7 +115,6 @@ class AbstractShipNavigate:
             "IN_ORBIT",
             "DOCKED",
         ]:
-            self.console.print("Ship at destination, not navigating...")
             return ship
         self.console.print("Going to orbit...")
         result = ship.orbit()
