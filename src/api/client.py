@@ -21,7 +21,7 @@ def safe_get(*, path: str) -> Union[Dict, Error]:
     api_data = response.json()
     if api_data.get("error"):
         error = Error(**api_data["error"])
-        if error.code == "429":
+        if error.code == 429:
             # We've hit a rate limit, sleep a bit and call the API again
             sleep(error.data["retryAfter"])
             return safe_get(path=path)
@@ -41,7 +41,7 @@ def safe_post(*, path: str, data: Optional[Dict] = None) -> Union[Dict, Error]:
     api_data = response.json()
     if api_data.get("error"):
         error = Error(**api_data["error"])
-        if error.code == "429":
+        if error.code == 429:
             # We've hit a rate limit, sleep a bit and call the API again
             sleep(error.data["retryAfter"])
             return safe_post(path=path, data=data)
