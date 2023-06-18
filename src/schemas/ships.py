@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class Cargo:
     capacity: int
     units: int
-    inventory: List[Dict[str, int]]
+    inventory: List[Dict]
 
 
 @attrs.define

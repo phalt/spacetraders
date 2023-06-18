@@ -8,38 +8,53 @@ from src.support.tables import attrs_to_rich_table, report_result
 
 
 @attrs.define
-class ShipNavigate:
-    symbol: str
-    destination: str
+class AbstractShipNavigate:
+    """
+    The best navigation functions to use.
+    """
 
-    @property
-    def name(self) -> str:
-        return f"Ship {self.symbol} navigate to {self.destination}"
+    ship_symbol: str
+    console: Console = Console()
 
-    def sleep(self):
-        sleep(20)
-
-    def process(self):
-        console = Console()
-        ship = Ship.get(symbol=self.symbol)
-        if (
-            ship.nav.waypointSymbol == self.destination
-            and ship.nav.status != "IN_TRANSIT"
-        ):
-            console.print(f"Ship {ship.symbol} has arrived at {self.destination}")
-            if ship.nav.status == "IN_ORBIT":
-                console.print("Ship is in orbit, docking...")
-                result = ship.dock()
-                report_result(result=result, HappyClass=Nav)
-        if ship.nav.status == "DOCKED":
-            console.print("Ship is docked, going to orbit...")
-            result = ship.orbit()
-            report_result(result=result, HappyClass=Nav)
-        console.print(
-            f"Ship is at {ship.nav.waypointSymbol}, navigating to {self.destination}..."
-        )
-        result = ship.navigate(waypoint=self.destination)
+    def navigate_to(self, ship: Ship, destination: str) -> Ship:
+        """
+        Navigate to the destination, returns the ship when it has arrived.
+        """
+        if ship.nav.waypointSymbol == destination and ship.nav.status in [
+            "IN_ORBIT",
+            "DOCKED",
+        ]:
+            self.console.print("Ship at destination, not navigating...")
+            return ship
+        self.console.print("Going to orbit...")
+        result = ship.orbit()
         report_result(result=result, HappyClass=Nav)
+
+        self.console.print(f"Going to destination {destination}")
+        result = ship.navigate(waypoint=destination)
+        report_result(result=result, HappyClass=Nav)
+
+        arrived = False
+        while arrived is False:
+            result = ship.navigation_status()
+            if result.waypointSymbol == destination and result.status == "IN_ORBIT":
+                self.console.print(f"Ship arrived at {destination}")
+                report_result(result=result, HappyClass=Nav)
+                arrived = True
+            else:
+                self.console.print("Ship in transit")
+                # This will display seconds to arrival and will always be an error class
+                result = ship.navigate(waypoint=destination)
+                report_result(result=result, HappyClass=Nav)
+                cooldown = result.data["secondsToArrival"]
+                sleep(cooldown)
+
+        result = ship.dock()
+        report_result(result, Nav)
+        result = ship.refuel()
+        self.console.print(result)
+        self.expenses += result["transaction"].totalPrice
+        return ship
 
 
 class ShowShipCargoStatus:

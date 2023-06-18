@@ -37,8 +37,8 @@ class Market:
         market_imports = [Commodity(**x) for x in data["imports"]]
         market_exports = [Commodity(**x) for x in data["exports"]]
         exchange = [Commodity(**x) for x in data["exchange"]]
-        transactions = [Transaction(**x) for x in data["transactions"]]
-        trade_goods = [TradeGood(**x) for x in data["tradeGoods"]]
+        transactions = [Transaction(**x) for x in data.get("transactions", [])]
+        trade_goods = [TradeGood(**x) for x in data.get("tradeGoods", [])]
         return cls(
             symbol=data["symbol"],
             marketImports=market_imports,

@@ -2,14 +2,15 @@ import attrs
 from time import sleep
 from rich.console import Console
 
-from src.schemas import Ship, Nav, Extraction, Cargo, Transaction
+from src.schemas import Ship, Extraction, Cargo, Transaction
 from src.schemas.errors import Error
 from src.support.tables import report_result
+from .ships import AbstractShipNavigate
 
 
 @attrs.define
-class MiningLoop:
-    symbol: str
+class MiningLoop(AbstractShipNavigate):
+    ship_symbol: str
     destination: str
     console: Console = Console()
     fuel_cost: int = 0
@@ -17,52 +18,10 @@ class MiningLoop:
 
     @property
     def name(self) -> str:
-        return f"Ship {self.symbol} mining @ {self.destination}"
+        return f"Ship {self.ship_symbol} mining @ {self.destination}"
 
     def sleep(self):
         pass
-
-    def navigate_to(self, ship: Ship) -> Ship:
-        """
-        Navigate to the destination, returns the ship when it has arrived.
-        """
-        if ship.nav.waypointSymbol == self.destination and ship.nav.status in [
-            "IN_ORBIT",
-            "DOCKED",
-        ]:
-            self.console.print("Ship at destination, not navigating...")
-            return ship
-        self.console.print("Going to orbit...")
-        result = ship.orbit()
-        report_result(result=result, HappyClass=Nav)
-
-        self.console.print(f"Going to destination {self.destination}")
-        result = ship.navigate(waypoint=self.destination)
-        report_result(result=result, HappyClass=Nav)
-
-        arrived = False
-        while arrived is False:
-            result = ship.navigation_status()
-            if (
-                result.waypointSymbol == self.destination
-                and result.status == "IN_ORBIT"
-            ):
-                self.console.print(f"Ship arrived at {self.destination}")
-                report_result(result=result, HappyClass=Nav)
-                arrived = True
-            else:
-                self.console.print("Ship in transit")
-                # This will display seconds to arrival
-                result = ship.navigate(waypoint=self.destination)
-                report_result(result=result, HappyClass=Nav)
-                sleep(20)
-
-        result = ship.dock()
-        report_result(result, Nav)
-        result = ship.refuel()
-        self.console.print(result)
-        self.fuel_cost = result["transaction"].totalPrice
-        return ship
 
     def mine_until_cargo_full(self, ship: Ship) -> Ship:
         """
@@ -114,8 +73,8 @@ class MiningLoop:
         return ship
 
     def process(self):
-        ship = Ship.get(symbol=self.symbol)
-        ship = self.navigate_to(ship)
+        ship = Ship.get(symbol=self.ship_symbol)
+        ship = self.navigate_to(ship, self.destination)
         ship = self.mine_until_cargo_full(ship)
         ship = self.sell_cargo(ship)
 

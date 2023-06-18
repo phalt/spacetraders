@@ -111,7 +111,7 @@ def market(symbol, depth):
 
 @click.command()
 @click.argument("symbol")
-@click.argument("content", required=False)
+@click.argument("content", default="1")
 def ship(symbol, content):
     """
     Return Ship information
@@ -119,6 +119,7 @@ def ship(symbol, content):
     """
     from src.schemas import Ship, Cargo, Nav
     from src.support.tables import report_result
+    from rich.pretty import pprint
 
     ship = Ship.get(symbol=symbol)
     if content == "cargo":
@@ -126,19 +127,20 @@ def ship(symbol, content):
     elif content == "nav":
         report_result(ship.navigation_status(), Nav)
     else:
-        report_result(ship, Ship)
+        pprint(ship, max_depth=int(content))
 
 
 @click.command()
-def ships():
+@click.argument("depth", default=1)
+def ships(depth):
     """
     Return all ship information
     """
     from src.schemas import ShipsManager
-    from src.support.tables import report_result
+    from rich.pretty import pprint
 
     result = ShipsManager.all()
-    report_result(result, ShipsManager)
+    pprint(result, max_depth=int(depth))
 
 
 @click.command()
@@ -197,8 +199,23 @@ def loop():
 
 @click.command()
 @click.argument("ship_symbol")
+@click.argument("contract_id")
+@click.argument("mining_destination")
+def contract_mining(ship_symbol, contract_id, mining_destination):
+    """
+    Set a ship on a loop procurring contract items.
+    Assumes contract is a simple mining contract.
+    We can get all info we need from the contract.
+    """
+    from src.logic.main import mining_contract_loop
+
+    mining_contract_loop(ship_symbol, contract_id, mining_destination)
+
+
+@click.command()
+@click.argument("ship_symbol")
 @click.argument("destination")
-def mining_loop(ship_symbol, destination):
+def mining(ship_symbol, destination):
     """
     Set a ship on the mining loop automation script.
     """
@@ -219,7 +236,8 @@ cli_group.add_command(buy_ship)
 cli_group.add_command(system_waypoints)
 cli_group.add_command(status)
 cli_group.add_command(loop)
-cli_group.add_command(mining_loop)
+cli_group.add_command(mining)
+cli_group.add_command(contract_mining)
 
 if __name__ == "__main__":
     cli_group()

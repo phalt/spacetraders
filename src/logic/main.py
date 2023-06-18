@@ -1,13 +1,16 @@
 from typing import List
 from rich.console import Console
 from src.logic.actions.mining import MiningLoop
+from src.logic.actions.contracts import ContractMiningLoop
 from src.logic.actions.agents import ShowAgentStatus
 
 from time import sleep
 
 INIT_ACTIONS = [ShowAgentStatus()]
 
-AUTOMATION_ACTIONS: List = [MiningLoop(symbol="GOOGL-3", destination="X1-KS52-51225B")]
+AUTOMATION_ACTIONS: List = [
+    MiningLoop(ship_symbol="GOOGL-3", destination="X1-KS52-51225B")
+]
 
 
 def main():
@@ -29,8 +32,21 @@ def main():
 
 
 def mining_loop(ship_symbol, destination):
-    action = MiningLoop(symbol=ship_symbol, destination=destination)
+    action = MiningLoop(ship_symbol=ship_symbol, destination=destination)
     console = Console()
     while True:
         console.rule(action.name)
         action.process()
+
+
+def mining_contract_loop(ship_symbol, contract_id, mining_destination):
+    action = ContractMiningLoop(
+        ship_symbol=ship_symbol,
+        contract_id=contract_id,
+        mining_destination=mining_destination,
+    )
+    console = Console()
+    contract_fulfilled = False
+    while contract_fulfilled is False:
+        console.rule(action.name)
+        contract_fulfilled = action.process()

@@ -25,16 +25,23 @@ Test run the application:
 make test_api
 ```
 
-## Automation
+## Simple mining loop
 
-Most of the game loop can be found in the `src/logic/` directory.
-I'e tried to standardise "actions" to perform so you can build up a list of actions
-and run it.
-
-You can run the automation like this:
+* Register as a new agent: 
 
 ```sh
-make automate
-``
+make query q='register'
+```
 
-Worth noting that in the automation stack things are async.
+Copy the results of this into a `env.ini` file in the project directory. This is your API key for your agent.
+
+* View you agent details
+
+```sh
+make query q='me'
+```
+
+* Purchase a ship
+
+Note: As of 17/06/2023 you start with a probe at a shipyard, usually you need a ship at a shipyard to buy new ships.
+You will n

@@ -1,4 +1,4 @@
-from typing import Self, List, Dict, Optional, Any, Union
+from typing import Self, List, Dict, Union
 import attrs
 
 from src.api import client, PATHS
@@ -20,7 +20,7 @@ class Term:
 
     deadline: str
     payment: Dict[str, int]
-    deliver: Optional[Dict[str, Any]]
+    deliver: List[Dict]
 
 
 @attrs.define

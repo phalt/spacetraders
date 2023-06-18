@@ -32,4 +32,7 @@ automate:  ## Run the automation loop
 	poetry run python cli.py loop
 
 mining_loop:  ## Set a specific ship on a mining loop
-	poetry run python cli.py mining-loop $(q)
+	poetry run python cli.py mining $(q)
+
+contract_loop:  ## Set up a specific ship to fulfill a contract
+	poetry run python cli.py contract-mining $(q)
