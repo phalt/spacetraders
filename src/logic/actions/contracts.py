@@ -1,9 +1,10 @@
+from typing import Optional
 import attrs
 from rich.console import Console
 from rich.table import Table
 
 from src.schemas.ships import Ship
-from src.schemas.contracts import Contract, ContractManager
+from src.schemas.contracts import Contract
 from src.support.tables import report_result
 
 
@@ -15,18 +16,12 @@ class ContractMiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining
     ship_symbol: str
     contract_id: str
     mining_destination: str
-    contract: Contract = None
-    contract_good: str = None
+    contract: Optional[Contract] = None
+    contract_good: Optional[str] = ""
     console: Console = Console()
     expenses: int = 0
     cargo_sales: int = 0
     delivery_this_run: bool = False
-
-    def get_contract(self):
-        contracts_manager = ContractManager.get()
-        contract = [c for c in contracts_manager.contracts if c.id == self.contract_id]
-        assert contract, f"No contract with ID {self.contract_id} found!"
-        self.contract = contract[0]
 
     @property
     def name(self) -> str:
@@ -40,12 +35,13 @@ class ContractMiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining
         Makes sure the contract is accepted and not fulfilled etc.
         Prints some useful information about it.
         """
-        report_result(self.contract, Contract)
-        if not self.contract.accepted:
-            self.console.print("Accepting contract...")
-            self.contract.accept()
+        if self.contract:
+            report_result(self.contract, Contract)
+            if not self.contract.accepted:
+                self.console.print("Accepting contract...")
+                self.contract.accept()
 
-        self.contract_good: str = self.contract.terms.deliver[0]["tradeSymbol"]
+            self.contract_good: str = self.contract.terms.deliver[0]["tradeSymbol"]
 
     def enough_contract_goods_to_sell(self, ship: Ship) -> bool:
         """
@@ -79,12 +75,13 @@ class ContractMiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining
             ]
         )
         self.console.print(f"Delivering {amount} of {self.contract_good}")
-        self.contract.deliver(
-            ship_symbol=ship.symbol, trade_symbol=self.contract_good, amount=amount
-        )
+        if self.contract_good and self.contract:
+            self.contract.deliver(
+                ship_symbol=ship.symbol, trade_symbol=self.contract_good, amount=amount
+            )
 
     def process(self):
-        self.get_contract()
+        self.contract = Contract.get(self.contract_id)
         self.set_up_contract()
         ship = Ship.get(symbol=self.ship_symbol)
         enough_trade_goods_to_sell = self.enough_contract_goods_to_sell(ship)
@@ -100,7 +97,7 @@ class ContractMiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining
             )
             self.deliver_goods(ship=ship)
 
-        self.get_contract()
+        self.contract = Contract.get(self.contract_id)
         table = Table(title="Contract progress")
         table.add_column("Delivered total")
         table.add_column("Goal")

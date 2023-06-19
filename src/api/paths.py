@@ -19,6 +19,9 @@ class Paths:
     MY_FACTIONS: str = f"{BASE_PATH}/my/factions"
     FACTIONS: str = f"{BASE_PATH}/factions"
 
+    def contract(self, contract_id: str) -> str:
+        return f"{self.MY_CONTRACTS}/{contract_id}"
+
     def ship(self, symbol: str) -> str:
         """
         Generate API path for a specific ship

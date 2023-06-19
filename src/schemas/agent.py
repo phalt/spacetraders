@@ -23,7 +23,7 @@ class Agent:
     startingFaction: str
 
     @classmethod
-    def me(cls) -> Self:
+    def me(cls) -> Union[Self, Error]:
         """
         Returns the "you" version of an Agent
         """
@@ -35,7 +35,10 @@ class Agent:
                 return result
 
     def headquarters_info(self) -> Waypoint:
-        return Waypoint.get(self.headquarters)
+        result = Waypoint.get(self.headquarters)
+        match result:
+            case Waypoint():
+                return result
 
 
 @attrs.define

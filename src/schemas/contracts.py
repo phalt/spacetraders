@@ -1,7 +1,7 @@
 from typing import Self, List, Dict, Union
 import attrs
 
-from src.api import client, PATHS, safe_post
+from src.api import client, PATHS, safe_post, safe_get
 
 from .errors import Error
 from .ships import Cargo
@@ -36,6 +36,15 @@ class Contract:
     fulfilled: bool
     expiration: str
     deadlineToAccept: str
+
+    @classmethod
+    def get(cls, contract_id: str) -> Union[Self, Error]:
+        result = safe_get(path=PATHS.contract(contract_id=contract_id))
+        match result:
+            case dict():
+                return cls.build(result)
+            case _:
+                return result
 
     @classmethod
     def build(cls, data) -> Self:
@@ -89,7 +98,7 @@ class ContractManager:
     contracts: List[Contract]
 
     @classmethod
-    def get(cls) -> Self:
+    def all(cls) -> Self:
         """
         Returns all contracts available to use
         """

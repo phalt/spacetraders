@@ -3,6 +3,7 @@ import attrs
 from time import sleep
 from rich.console import Console
 from rich.table import Table
+from abc import ABC
 
 from collections import defaultdict
 
@@ -102,10 +103,9 @@ class AbstractSellCargo:
         return ship
 
 
-@attrs.define
-class AbstractShipNavigate:
-    ship_symbol: str
-    console: Console = Console()
+class AbstractShipNavigate(ABC):
+    console: Console
+    expenses: int
 
     def navigate_to(self, ship: Ship, destination: str) -> Ship:
         """
@@ -116,10 +116,7 @@ class AbstractShipNavigate:
             "DOCKED",
         ]:
             return ship
-        self.console.print("Going to orbit...")
         result = ship.orbit()
-        report_result(result=result, HappyClass=Nav)
-
         self.console.print(f"Going to destination {destination}")
         result = ship.navigate(waypoint=destination)
         report_result(result=result, HappyClass=Nav)
@@ -140,10 +137,13 @@ class AbstractShipNavigate:
                 sleep(cooldown)
 
         result = ship.dock()
-        report_result(result, Nav)
         result = ship.refuel()
-        self.console.print(result)
-        self.expenses += result["transaction"].totalPrice
+        match result:
+            case Error():
+                report_result(result, Nav)
+            case dict():
+                self.console.print(result)
+                self.expenses += result["transaction"].totalPrice
         return ship
 
 

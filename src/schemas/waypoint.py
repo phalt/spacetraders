@@ -2,6 +2,7 @@ from typing import List, Dict, Self, Optional, Union, Any
 import attrs
 
 from src.api import PATHS, safe_get
+from src.schemas.errors import Error
 
 
 @attrs.define
@@ -47,12 +48,15 @@ class Waypoint:
         for trait_data in data.pop("traits", []):
             trait = Trait(**trait_data)
             if trait.symbol == "SHIPYARD":
-                trait.shipyard = Shipyard.get(symbol=data["symbol"])
+                result = Shipyard.get(symbol=data["symbol"])
+                match result:
+                    case Shipyard():
+                        trait.shipyard = result
             traits.append(trait)
         return cls(**data, orbitals=orbitals, traits=traits)
 
     @classmethod
-    def get(cls, symbol: str) -> Self:
+    def get(cls, symbol: str) -> Union[Self, Error]:
         result = safe_get(path=PATHS.waypoint(symbol=symbol))
         match result:
             case dict():
@@ -78,7 +82,7 @@ class Shipyard:
         return cls(**data)
 
     @classmethod
-    def get(cls, symbol: str) -> Self:
+    def get(cls, symbol: str) -> Union[Self, Error]:
         result = safe_get(path=PATHS.shipyard(symbol=symbol))
         match result:
             case dict():
