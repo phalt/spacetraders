@@ -27,9 +27,6 @@ class ContractMiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining
     def name(self) -> str:
         return f"Ship {self.ship_symbol} peforming contract {self.contract_id}"
 
-    def sleep(self):
-        pass
-
     def set_up_contract(self) -> None:
         """
         Makes sure the contract is accepted and not fulfilled etc.
