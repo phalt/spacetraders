@@ -25,23 +25,15 @@ Test run the application:
 make test_api
 ```
 
-## Simple mining loop
+## TODO
 
-* Register as a new agent: 
-
-```sh
-make query q='register'
-```
-
-Copy the results of this into a `env.ini` file in the project directory. This is your API key for your agent.
-
-* View you agent details
-
-```sh
-make query q='me'
-```
-
-* Purchase a ship
-
-Note: As of 17/06/2023 you start with a probe at a shipyard, usually you need a ship at a shipyard to buy new ships.
-You will n
+- Set up database for Surveys
+- Get SurveyLoop working
+- Make MiningLoop take into account any Surveys in the database that are valid
+- Convert all date strings to use the src.support.datetime.DateTime object
+- NICE: Display euclidean distance in navigation function when navigating somewhere
+- Set up database to track which Ships are IDLE or WORKING
+- Simple CLI to put a Ship in IDLE
+- Make Async MiningLoop worker that takes an array of ship_symbols and works them all
+- Make Async MiningLoop grab available ships from Ship database
+- Make buy-ship automatically put ship into idle state
