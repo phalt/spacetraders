@@ -1,9 +1,10 @@
-from typing import Union, Dict, Optional
+from time import sleep
+from typing import Dict, Optional, Union
+
 import httpx
 
-from src.settings import config
-from time import sleep
 from src.schemas.errors import Error
+from src.settings import config
 
 headers = {"Authorization": f"Bearer {config.get('api', 'key')}"}
 

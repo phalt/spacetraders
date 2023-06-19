@@ -121,6 +121,12 @@ class Paths:
         """
         return f"{BASE_PATH}/my/contracts/{contract_id}/accept"
 
+    def contract_fulfill(self, contract_id: str) -> str:
+        """
+        Generate the API path for fulfilling a contract.
+        """
+        return f"{BASE_PATH}/my/contracts/{contract_id}/fulfill"
+
     def contract_deliver(self, contract_id: str) -> str:
         """
         Generate the API path for delivering on a contract.

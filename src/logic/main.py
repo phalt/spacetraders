@@ -1,6 +1,7 @@
 from rich.console import Console
-from src.logic.actions.mining import MiningLoop
+
 from src.logic.actions.contracts import ContractMiningLoop
+from src.logic.actions.mining import MiningLoop
 
 
 def mining_loop(ship_symbol, destination):

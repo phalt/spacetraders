@@ -1,4 +1,5 @@
-from typing import List, Dict, Self, Union
+from typing import Dict, List, Self, Union
+
 import attrs
 
 from src.api import PATHS, safe_get

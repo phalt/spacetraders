@@ -1,14 +1,14 @@
 from typing import Optional
+
 import attrs
 from rich.console import Console
 from rich.table import Table
 
-from src.schemas.ships import Ship
 from src.schemas.contracts import Contract
+from src.schemas.ships import Ship
 from src.support.tables import report_result
 
-
-from .ships import AbstractShipNavigate, AbstractSellCargo, AbstractMining
+from .ships import AbstractMining, AbstractSellCargo, AbstractShipNavigate
 
 
 @attrs.define

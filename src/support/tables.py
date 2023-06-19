@@ -1,8 +1,9 @@
-from typing import TypeVar, Type, Iterable, Any
 from decimal import Decimal
+from typing import Any, Iterable, Type, TypeVar
+
 import attrs
-from rich.table import Table
 from rich.console import Console
+from rich.table import Table
 
 from src.schemas.errors import Error
 

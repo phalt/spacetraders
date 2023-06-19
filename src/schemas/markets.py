@@ -1,9 +1,11 @@
-from typing import List, Dict, Self, Union
+from typing import Dict, List, Self, Union
+
 import attrs
 
-from .transactions import Transaction
 from src.api import PATHS, safe_get
+
 from .errors import Error
+from .transactions import Transaction
 
 
 @attrs.define

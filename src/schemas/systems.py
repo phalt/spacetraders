@@ -1,11 +1,11 @@
-from typing import List, Self, Union, Dict
+from typing import Dict, List, Self, Union
+
 import attrs
 
-
-from src.api import client, PATHS, safe_get
-from .waypoint import Waypoint, WaypointSummary
-
+from src.api import PATHS, client, safe_get
 from src.schemas.errors import Error
+
+from .waypoint import Waypoint, WaypointSummary
 
 
 @attrs.define

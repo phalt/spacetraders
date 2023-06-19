@@ -1,13 +1,14 @@
-from typing import List, Dict, Self, Optional, Any, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Self, Union
+
 import attrs
 
-from src.api import client, PATHS, safe_get, safe_post
+from src.api import PATHS, client, safe_get, safe_post
 
-from .nav import Nav
 from .errors import Error
-from .transactions import Transaction
-from .mining import Extraction, Survey
 from .generic import Cooldown
+from .mining import Extraction, Survey
+from .nav import Nav
+from .transactions import Transaction
 
 if TYPE_CHECKING:
     pass

@@ -1,12 +1,13 @@
-from typing import Self, List, Dict, Union
+from typing import Dict, List, Self, Union
+
 import attrs
+from structlog import get_logger
 
-from src.api import client, PATHS, safe_post, safe_get
+from src.api import PATHS, client, safe_get, safe_post
 
+from .agent import Agent
 from .errors import Error
 from .ships import Cargo
-
-from structlog import get_logger
 
 log = get_logger(__name__)
 
@@ -51,7 +52,22 @@ class Contract:
         terms = Term(**data.pop("terms"))
         return cls(**data, terms=terms)
 
-    def accept(self) -> None:
+    def fulfill(self) -> Union[Dict, Error]:
+        """
+        Fullfills a contract.
+        """
+        result = safe_post(path=PATHS.contract_fulfill(self.id))
+        match result:
+            case dict():
+                self.fulfilled = True
+                return dict(
+                    contract=Contract.build(result["contract"]),
+                    agent=Agent(**result["agent"]),
+                )
+            case _:
+                return result
+
+    def accept(self) -> Union[Dict, Error]:
         """
         Accepts a contract if it has not been accepted yet.
         """
@@ -61,9 +77,15 @@ class Contract:
         ), "Cannot accept a contract that is already accepted!"
 
         result = safe_post(path=PATHS.contract_accept(self.id))
-        log.info(f"Accepted contract {self.id}")
-        log.info(result)
-        self.accepted = True
+        match result:
+            case dict():
+                self.accepted = True
+                return dict(
+                    contract=Contract.build(result["contract"]),
+                    agent=Agent(**result["agent"]),
+                )
+            case _:
+                return result
 
     def deliver(
         self, ship_symbol: str, trade_symbol: str, amount: int

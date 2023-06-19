@@ -1,4 +1,5 @@
-from typing import Union, Dict
+from typing import Dict, Union
+
 from httpx import Response
 
 from src.schemas.errors import Error

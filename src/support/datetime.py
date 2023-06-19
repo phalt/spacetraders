@@ -1,9 +1,10 @@
+from datetime import datetime
 from typing import Self
+
 import attrs
+import pytz
 
 from src.settings import config
-import pytz
-from datetime import datetime
 
 
 @attrs.define

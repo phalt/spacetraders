@@ -1,14 +1,15 @@
-from typing import Self, Union, Optional
-import attrs
+from typing import Optional, Self, Union
 
-from .waypoint import Waypoint
+import attrs
 
 from src.api import PATHS, bare_client, safe_get
 from src.api.utils import data_or_error
+
 from .contracts import Contract
-from .ships import Ship
-from .factions import Faction
 from .errors import Error
+from .factions import Faction
+from .ships import Ship
+from .waypoint import Waypoint
 
 
 @attrs.define

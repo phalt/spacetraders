@@ -2,7 +2,8 @@ import attrs
 from rich.console import Console
 
 from src.schemas.ships import Ship
-from .ships import AbstractShipNavigate, AbstractSellCargo
+
+from .ships import AbstractSellCargo, AbstractShipNavigate
 
 
 @attrs.define

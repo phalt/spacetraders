@@ -3,7 +3,6 @@ from os.path import abspath, dirname, join
 from typing import Any, List
 
 from cachetools import TTLCache
-
 from structlog import get_logger
 
 log = get_logger(name=__name__)

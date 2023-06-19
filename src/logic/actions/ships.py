@@ -1,14 +1,14 @@
-from typing import List, Optional
+from abc import ABC
+from collections import defaultdict
 from time import sleep
+from typing import List, Optional
+
 from rich.console import Console
 from rich.table import Table
-from abc import ABC
 
-from collections import defaultdict
-
-from src.schemas.ships import Ship, Nav, Cargo
 from src.schemas.errors import Error
 from src.schemas.mining import Extraction
+from src.schemas.ships import Cargo, Nav, Ship
 from src.schemas.transactions import Transaction
 from src.support.tables import report_result
 

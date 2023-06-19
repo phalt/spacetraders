@@ -1,5 +1,4 @@
 import click
-
 from rich import print
 
 print(":rocket: Paul's SpaceTraders.io client :moon:")
@@ -20,10 +19,11 @@ def register(symbol, faction, email):
     """
     Register a new agent.
     """
-    from src.schemas.agent import AgentManager
-    from src.schemas.errors import Error
     from rich.pretty import pprint
     from structlog import get_logger
+
+    from src.schemas.agent import AgentManager
+    from src.schemas.errors import Error
 
     log = get_logger(__name__)
 
@@ -62,8 +62,9 @@ def contracts(depth):
     """
     Returns contracts available to you
     """
-    from src.schemas.contracts import ContractManager
     from rich.pretty import pprint
+
+    from src.schemas.contracts import ContractManager
 
     result = ContractManager.all()
     pprint(result, max_depth=int(depth))
@@ -76,8 +77,9 @@ def waypoint(symbol, depth):
     """
     Return Waypoint information
     """
-    from src.schemas.waypoint import Waypoint
     from rich.pretty import pprint
+
+    from src.schemas.waypoint import Waypoint
 
     result = Waypoint.get(symbol=symbol)
     pprint(result, max_depth=depth)
@@ -90,8 +92,9 @@ def shipyard(symbol, depth):
     """
     Return Shipyard information
     """
-    from src.schemas.waypoint import Shipyard
     from rich.pretty import pprint
+
+    from src.schemas.waypoint import Shipyard
 
     result = Shipyard.get(symbol=symbol)
     pprint(result, max_depth=int(depth))
@@ -104,8 +107,9 @@ def market(symbol, depth):
     """
     Return Market information
     """
-    from src.schemas.markets import Market
     from rich.pretty import pprint
+
+    from src.schemas.markets import Market
 
     result = Market.get(symbol=symbol)
     pprint(result, max_depth=int(depth))
@@ -119,9 +123,10 @@ def ship(symbol, content):
     Return Ship information
     Second argument determines content
     """
-    from src.schemas.ships import Ship, Cargo, Nav
-    from src.support.tables import report_result
     from rich.pretty import pprint
+
+    from src.schemas.ships import Cargo, Nav, Ship
+    from src.support.tables import report_result
 
     ship = Ship.get(symbol=symbol)
     if content == "cargo":
@@ -140,10 +145,11 @@ def ships(content):
     """
     Return all ship information
     """
-    from src.schemas.ships import ShipsManager, Cargo, Nav
-    from src.support.tables import report_result
-    from rich.pretty import pprint
     from rich.console import Console
+    from rich.pretty import pprint
+
+    from src.schemas.ships import Cargo, Nav, ShipsManager
+    from src.support.tables import report_result
 
     console = Console()
 
@@ -167,8 +173,9 @@ def system_waypoints(symbol, depth):
     """
     Return SystemWaypoints information
     """
-    from src.schemas.systems import SystemWaypoints
     from rich.pretty import pprint
+
+    from src.schemas.systems import SystemWaypoints
 
     result = SystemWaypoints.get(symbol=symbol)
     pprint(result, max_depth=int(depth))
@@ -181,8 +188,9 @@ def system(symbol, depth):
     """
     Return System information
     """
-    from src.schemas.systems import System
     from rich.pretty import pprint
+
+    from src.schemas.systems import System
 
     result = System.get(symbol=symbol)
     pprint(result, max_depth=int(depth))
@@ -197,8 +205,9 @@ def buy_ship(ship, waypoint, depth):
     Purchase a ship.
     You must have a ship docked at this waypoint to purchase.
     """
-    from src.schemas.ships import ShipsManager
     from rich.pretty import pprint
+
+    from src.schemas.ships import ShipsManager
 
     result = ShipsManager.buy_ship(ship_type=ship, waypoint_symbol=waypoint)
     pprint(result, max_depth=int(depth))
@@ -212,7 +221,8 @@ def status(depth):
     You must have a ship docked at this waypoint to purchase.
     """
     from rich.pretty import pprint
-    from src.api import bare_client, PATHS
+
+    from src.api import PATHS, bare_client
 
     result = bare_client.get(PATHS.SERVER_STATUS)
     pprint(result.json(), max_depth=int(depth))
