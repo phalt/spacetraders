@@ -1,5 +1,18 @@
-from typing import Dict
+from typing import Dict, List
 import attrs
+
+
+@attrs.define
+class Survey:
+    """
+    A survey result
+    """
+
+    signature: str
+    symbol: str
+    deposits: List[Dict]
+    expiration: str
+    size: str
 
 
 @attrs.define

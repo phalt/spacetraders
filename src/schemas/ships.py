@@ -6,7 +6,7 @@ from src.api import client, PATHS, safe_get, safe_post
 from .nav import Nav
 from .errors import Error
 from .transactions import Transaction
-from .mining import Extraction
+from .mining import Extraction, Survey
 from .generic import Cooldown
 
 if TYPE_CHECKING:
@@ -226,6 +226,23 @@ class Ship:
                     extraction=Extraction(**result["extraction"], yield_=yield_),
                     cooldown=Cooldown(**result["cooldown"]),
                     cargo=Cargo(**result["cargo"]),
+                )
+            case _:
+                return result
+
+    def survey(self) -> Union[Dict, Error]:
+        """
+        Perform a survey in the current location.
+        """
+        from rich.pretty import pprint
+
+        result = safe_post(path=PATHS.ship_survey(self.symbol))
+        pprint(result)
+        match result:
+            case dict():
+                return dict(
+                    surveys=[Survey(**x) for x in result["surveys"]],
+                    cooldown=Cooldown(**result["cooldown"]),
                 )
             case _:
                 return result

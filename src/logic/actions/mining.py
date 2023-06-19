@@ -26,3 +26,22 @@ class MiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining):
         self.console.print(
             f"Total earned from mining run = {self.cargo_sales - self.expenses}"
         )
+
+
+@attrs.define
+class SurveyLoop(AbstractShipNavigate):
+    """
+    Navigate to a destination and store surveys in a database.
+    Requires a database connection!
+    """
+
+    ship_symbol: str
+    destination: str
+    console: Console = Console()
+    expenses: int = 0
+
+    def process(self):
+        ship = Ship.get(ship=self.ship_symbol)
+        ship = self.navigate_to(ship, self.destination)
+        # Ship survey
+        # Store result in database

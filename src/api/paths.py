@@ -76,6 +76,12 @@ class Paths:
         """
         return f"{self.ship(symbol=symbol)}/extract"
 
+    def ship_survey(self, symbol: str) -> str:
+        """
+        API path to perform surveying
+        """
+        return f"{self.ship(symbol=symbol)}/survey"
+
     def system_waypoints(self, symbol: str) -> str:
         """
         Generate the API path for system_waypoints.

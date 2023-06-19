@@ -24,11 +24,6 @@ class SpaceTradersConfig(ConfigParser):
         self.read(self.get_config_files())
 
     def get_config_files(self) -> List[str]:
-        """
-        Takes all .ini files in the root dir and
-        generates config vars from them
-        """
-
         files = [
             join(self.config_path, "env.ini"),
         ]
