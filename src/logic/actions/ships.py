@@ -1,5 +1,4 @@
 from typing import List, Optional
-import attrs
 from time import sleep
 from rich.console import Console
 from rich.table import Table
@@ -7,15 +6,14 @@ from abc import ABC
 
 from collections import defaultdict
 
-from src.schemas.ships import Ship, ShipsManager, Nav, Cargo
+from src.schemas.ships import Ship, Nav, Cargo
 from src.schemas.errors import Error
 from src.schemas.mining import Extraction
 from src.schemas.transactions import Transaction
-from src.support.tables import attrs_to_rich_table, report_result
+from src.support.tables import report_result
 
 
-@attrs.define
-class AbstractMining:
+class AbstractMining(ABC):
     def mine_until_cargo_full(self, ship: Ship) -> Ship:
         ship.orbit()
         cargo_status = ship.cargo_status()
@@ -56,8 +54,7 @@ class AbstractMining:
         return ship
 
 
-@attrs.define
-class AbstractSellCargo:
+class AbstractSellCargo(ABC):
     def sell_cargo(
         self, ship: Ship, do_not_sell_symbols: Optional[List[str]] = []
     ) -> Ship:
@@ -145,20 +142,3 @@ class AbstractShipNavigate(ABC):
                 self.console.print(result)
                 self.expenses += result["transaction"].totalPrice
         return ship
-
-
-class ShowShipCargoStatus:
-    name = "Show ship cargo status"
-    description = (
-        "Gathers all the ships available to us and show the cargo contents for each one"
-    )
-
-    def sleep(self):
-        pass
-
-    def process(self):
-        ships = ShipsManager.all()
-        console = Console()
-        for ship in ships.ships:
-            console.print(f":package: Cargo for {ship.symbol}", emoji=True)
-            console.print(attrs_to_rich_table(Cargo, [ship.cargo]))

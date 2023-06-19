@@ -15,7 +15,8 @@ def cli_group():
 @click.command()
 @click.argument("symbol")
 @click.argument("faction", default="COSMIC")
-def register(symbol, faction):
+@click.argument("email", default="")
+def register(symbol, faction, email):
     """
     Register a new agent.
     """
@@ -26,7 +27,7 @@ def register(symbol, faction):
 
     log = get_logger(__name__)
 
-    result = AgentManager.register_new(symbol=symbol, faction=faction)
+    result = AgentManager.register_new(symbol=symbol, faction=faction, email=email)
     if isinstance(result, Error):
         pprint(result)
     else:

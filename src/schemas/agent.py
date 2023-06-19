@@ -1,4 +1,4 @@
-from typing import Self, Union
+from typing import Self, Union, Optional
 import attrs
 
 from .waypoint import Waypoint
@@ -50,9 +50,11 @@ class AgentManager:
     ship: Ship
 
     @classmethod
-    def register_new(cls, symbol: str, faction: str) -> Union[Self, Error]:
+    def register_new(
+        cls, symbol: str, faction: str, email: Optional[str] = None
+    ) -> Union[Self, Error]:
         api_response = bare_client.post(
-            PATHS.REGISTER, data={"symbol": symbol, "faction": faction}
+            PATHS.REGISTER, data={"symbol": symbol, "faction": faction, "email": email}
         )
         result = data_or_error(api_response=api_response)
         match result:
