@@ -64,7 +64,7 @@ def contracts(depth):
     from src.schemas.contracts import ContractManager
     from rich.pretty import pprint
 
-    result = ContractManager.get()
+    result = ContractManager.all()
     pprint(result, max_depth=int(depth))
 
 
