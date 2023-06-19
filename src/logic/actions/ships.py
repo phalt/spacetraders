@@ -3,6 +3,7 @@ from collections import defaultdict
 from time import sleep
 from typing import List, Optional
 
+import attrs
 from rich.console import Console
 from rich.table import Table
 
@@ -142,3 +143,19 @@ class AbstractShipNavigate(ABC):
                 report_result(result["transaction"], Transaction)
                 self.expenses += result["transaction"].totalPrice
         return ship
+
+
+@attrs.define
+class SimpleShipNavigateAction(AbstractShipNavigate):
+    """
+    Simple action for navigating a ship to a destination.
+    """
+
+    destination: str
+    ship_symbol: str
+    console: Console = Console()
+    expenses: int = 0
+
+    def process(self):
+        ship = Ship.get(self.ship_symbol)
+        self.navigate_to(ship, self.destination)
