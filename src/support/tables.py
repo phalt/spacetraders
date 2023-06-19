@@ -35,6 +35,12 @@ def attrs_to_rich_table(row_type: Type[X], rows: Iterable[X]) -> Table:
         )
 
     for row in rows:
-        table.add_row(*(str(item) for item in attrs.astuple(row)))
-
+        row_items = []
+        for field, value in attrs.asdict(row, recurse=False).items():
+            if attrs.has(value):
+                value = attrs_to_rich_table(value.__class__, [value])
+            else:
+                value = str(value)
+            row_items.append(value)
+        table.add_row(*row_items)
     return table

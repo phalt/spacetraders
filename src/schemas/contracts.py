@@ -5,7 +5,6 @@ from structlog import get_logger
 
 from src.api import PATHS, client, safe_get, safe_post
 
-from .agent import Agent
 from .errors import Error
 from .ships import Cargo
 
@@ -56,6 +55,8 @@ class Contract:
         """
         Fullfills a contract.
         """
+        from .agent import Agent
+
         result = safe_post(path=PATHS.contract_fulfill(self.id))
         match result:
             case dict():
@@ -71,10 +72,7 @@ class Contract:
         """
         Accepts a contract if it has not been accepted yet.
         """
-
-        assert (
-            self.accepted is False
-        ), "Cannot accept a contract that is already accepted!"
+        from .agent import Agent
 
         result = safe_post(path=PATHS.contract_accept(self.id))
         match result:
