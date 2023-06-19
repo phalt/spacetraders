@@ -167,10 +167,24 @@ def system_waypoints(symbol, depth):
     """
     Return SystemWaypoints information
     """
-    from src.schemas.system import SystemWaypoints
+    from src.schemas.systems import SystemWaypoints
     from rich.pretty import pprint
 
     result = SystemWaypoints.get(symbol=symbol)
+    pprint(result, max_depth=int(depth))
+
+
+@click.command()
+@click.argument("symbol")
+@click.argument("depth", default=1)
+def system(symbol, depth):
+    """
+    Return System information
+    """
+    from src.schemas.systems import System
+    from rich.pretty import pprint
+
+    result = System.get(symbol=symbol)
     pprint(result, max_depth=int(depth))
 
 
@@ -251,6 +265,7 @@ cli_group.add_command(ship)
 cli_group.add_command(ships)
 cli_group.add_command(buy_ship)
 cli_group.add_command(system_waypoints)
+cli_group.add_command(system)
 cli_group.add_command(status)
 cli_group.add_command(loop)
 cli_group.add_command(mining)

@@ -90,6 +90,12 @@ class Paths:
         system = "-".join(parts[:2])
         return f"{BASE_PATH}/systems/{system}/waypoints"
 
+    def system(self, symbol: str) -> str:
+        """
+        Generate the API path for a system.
+        """
+        return f"{BASE_PATH}/systems/{symbol}"
+
     def waypoint(self, symbol: str) -> str:
         """
         Generate the API path for a waypoint.

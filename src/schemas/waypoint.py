@@ -30,6 +30,14 @@ class Orbital:
 
 
 @attrs.define
+class WaypointSummary:
+    symbol: str
+    type: str
+    x: int
+    y: int
+
+
+@attrs.define
 class Waypoint:
     systemSymbol: str
     symbol: str
