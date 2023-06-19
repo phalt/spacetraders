@@ -114,24 +114,24 @@ class AbstractShipNavigate(ABC):
         ]:
             return ship
         result = ship.orbit()
-        self.console.print(f"Going to destination {destination}")
         result = ship.navigate(waypoint=destination)
         report_result(result=result, HappyClass=Nav)
+        with self.console.status(f"Going to destination {destination}..."):
+            arrived = False
+            while arrived is False:
+                result = ship.navigation_status()
+                if result.waypointSymbol == destination and result.status == "IN_ORBIT":
+                    arrived = True
+                else:
+                    # This will display seconds to arrival
+                    result = ship.navigate(waypoint=destination)
+                    report_result(result=result, HappyClass=Nav)
+                    cooldown = result.data["secondsToArrival"]
+                    sleep(cooldown)
 
-        arrived = False
-        while arrived is False:
-            result = ship.navigation_status()
-            if result.waypointSymbol == destination and result.status == "IN_ORBIT":
-                self.console.print(f"Ship arrived at {destination}")
-                report_result(result=result, HappyClass=Nav)
-                arrived = True
-            else:
-                self.console.print("Ship in transit")
-                # This will display seconds to arrival and will always be an error class
-                result = ship.navigate(waypoint=destination)
-                report_result(result=result, HappyClass=Nav)
-                cooldown = result.data["secondsToArrival"]
-                sleep(cooldown)
+        self.console.print(
+            f"Ship arrived at {destination}, docking and refuelling",
+        )
 
         result = ship.dock()
         result = ship.refuel()
@@ -139,6 +139,6 @@ class AbstractShipNavigate(ABC):
             case Error():
                 report_result(result, Nav)
             case dict():
-                self.console.print(result)
+                report_result(result["transaction"], Transaction)
                 self.expenses += result["transaction"].totalPrice
         return ship
