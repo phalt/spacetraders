@@ -13,12 +13,26 @@ from .transactions import Transaction
 if TYPE_CHECKING:
     pass
 
+@attrs.define
+class Inventory:
+    symbol: str
+    name: str
+    description: str
+    units: int
 
 @attrs.define
 class Cargo:
     capacity: int
     units: int
-    inventory: List[Dict]
+    inventory: List[Inventory]
+
+    @classmethod
+    def build(cls, data) -> Self:
+        inventory = [Inventory(**x) for x in data.pop('inventory')]
+        return cls(
+            **data,
+            inventory=inventory
+        )
 
 
 @attrs.define
@@ -119,7 +133,7 @@ class Ship:
         reactor = Reactor(**data["reactor"])
         frame = Frame(**data["frame"])
         registration = Registration(**data["registration"])
-        cargo = Cargo(**data["cargo"])
+        cargo = Cargo.build(data["cargo"])
         modules = [Module(**x) for x in data["modules"]]
         mounts = [Mount(**x) for x in data["mounts"]]
         nav = Nav.build(data["nav"])
@@ -159,7 +173,7 @@ class Ship:
         result = safe_get(path=PATHS.ship_cargo(self.symbol))
         match result:
             case dict():
-                return Cargo(**result)
+                return Cargo.build(result)
             case _:
                 return result
 
@@ -226,7 +240,7 @@ class Ship:
                 return dict(
                     extraction=Extraction(**result["extraction"], yield_=yield_),
                     cooldown=Cooldown(**result["cooldown"]),
-                    cargo=Cargo(**result["cargo"]),
+                    cargo=Cargo.build(result["cargo"]),
                 )
             case _:
                 return result
@@ -261,7 +275,7 @@ class Ship:
             case dict():
                 return dict(
                     agent=Agent(**result["agent"]),
-                    cargo=Cargo(**result["cargo"]),
+                    cargo=Cargo.build(result["cargo"]),
                     transaction=Transaction(**result["transaction"]),
                 )
             case _:

@@ -77,9 +77,9 @@ class AbstractSellCargo(ABC):
                     cargo_table.add_column("price per unit")
                     cargo_table.add_column("total price")
                     items_units = [
-                        (x["symbol"], x["units"])
+                        (x.symbol, x.units)
                         for x in cargo.inventory
-                        if x["symbol"] not in do_not_sell_symbols
+                        if x.symbol not in do_not_sell_symbols
                     ]
                     for symbol, units in items_units:
                         result = ship.sell(symbol=symbol, amount=units)

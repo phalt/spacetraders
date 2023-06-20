@@ -100,7 +100,7 @@ class Contract:
             case dict():
                 return dict(
                     contract=Contract.build(result["contract"]),
-                    cargo=Cargo(**result["cargo"]),
+                    cargo=Cargo.build(result["cargo"]),
                 )
             case _:
                 return result
