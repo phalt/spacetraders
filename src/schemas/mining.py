@@ -19,6 +19,27 @@ class Survey:
     expiration: DateTime
     size: str
 
+    def drop(self) -> None:
+        """
+        Remove from the database
+        """
+        with get_db() as db:
+            survey_model: SurveyModel = (
+                db.query(SurveyModel)
+                .filter(SurveyModel.signature == self.signature)
+                .one()
+            )
+            db.delete(survey_model)
+            db.commit()
+
+    def payload(self) -> Dict:
+        """
+        Like attrs.asdict but formats the datetime value properly
+        """
+        as_dict = attrs.asdict(self)
+        as_dict["expiration"] = as_dict["expiration"]["raw"]
+        return as_dict
+
     @classmethod
     def build(cls, data: Dict) -> Self:
         date_time = DateTime.build(datetime_string=data.pop("expiration"))

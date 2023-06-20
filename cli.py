@@ -245,13 +245,16 @@ def contract_mining(ship, id, mine):
 @click.command()
 @click.option("--ship", "-s", help="ship symbol", required=True)
 @click.option("--dest", "-d", help="destination to mine", required=True)
-def mining(ship, dest):
+@click.option(
+    "--surveys", default=False, help="Try and use surveys stored in the DB to help"
+)
+def mining(ship, dest, surveys):
     """
     Set a ship on the mining loop
     """
     from src.logic.main import mining_loop
 
-    mining_loop(ship_symbol=ship, destination=dest)
+    mining_loop(ship_symbol=ship, destination=dest, with_surveys=surveys)
 
 
 @click.command()
@@ -275,7 +278,9 @@ def survey(ship, dest):
     """
     from src.logic.actions.surveys import SurveyDestinationAction
 
-    SurveyDestinationAction(ship_symbol=ship, destination=dest).process()
+    SurveyDestinationAction(
+        ship_symbol=ship, destination=dest, clean_up_old_surveys=True
+    ).process()
 
 
 cli_group.add_command(register)

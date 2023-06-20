@@ -241,11 +241,15 @@ class Ship:
             case _:
                 return result
 
-    def extract(self) -> Union[Dict, Error]:
+    def extract(self, survey: Optional[Survey] = None) -> Union[Dict, Error]:
         """
         Perform mining extraction at the current waypoint.
         """
-        result = safe_post(path=PATHS.ship_extract(self.symbol))
+        if survey:
+            data = dict(survey=survey.payload())
+        else:
+            data = None
+        result = safe_post(path=PATHS.ship_extract(self.symbol), data=data)
         match result:
             case dict():
                 yield_ = result["extraction"].pop("yield")

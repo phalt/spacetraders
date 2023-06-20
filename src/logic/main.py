@@ -4,8 +4,10 @@ from src.logic.actions.contracts import ContractMiningLoop
 from src.logic.actions.mining import MiningLoop
 
 
-def mining_loop(ship_symbol, destination):
-    action = MiningLoop(ship_symbol=ship_symbol, destination=destination)
+def mining_loop(ship_symbol, destination, with_surveys):
+    action = MiningLoop(
+        ship_symbol=ship_symbol, destination=destination, with_surveys=with_surveys
+    )
     console = Console()
     while True:
         console.rule(action.name)

@@ -6,6 +6,12 @@ import pytz
 
 from src.settings import config
 
+LOCAL_TZ = config.get("time", "zone")
+
+
+def local_now():
+    return datetime.now().astimezone(tz=pytz.timezone(LOCAL_TZ))
+
 
 @attrs.define
 class DateTime:
@@ -20,6 +26,5 @@ class DateTime:
     @classmethod
     def build(cls, datetime_string: str) -> Self:
         utc_time = datetime.fromisoformat(datetime_string)
-        tz = config.get("time", "zone")
-        local_timezone = utc_time.astimezone(tz=pytz.timezone(tz))
+        local_timezone = utc_time.astimezone(tz=pytz.timezone(LOCAL_TZ))
         return cls(raw=datetime_string, utc_time=utc_time, local_time=local_timezone)

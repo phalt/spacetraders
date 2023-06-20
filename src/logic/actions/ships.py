@@ -8,15 +8,18 @@ from rich.console import Console
 from rich.table import Table
 
 from src.schemas.errors import Error
-from src.schemas.mining import Extraction
+from src.schemas.mining import Extraction, Survey
 from src.schemas.ships import Cargo, Nav, Ship
 from src.schemas.transactions import Transaction
 from src.schemas.waypoint import Waypoint
+from src.support.datetime import local_now
 from src.support.tables import report_result
 
 
 class AbstractMining(ABC):
-    def mine_until_cargo_full(self, ship: Ship) -> Ship:
+    with_surveys: bool
+
+    def mine_until_cargo_full(self, ship: Ship, destination: str) -> Ship:
         ship.orbit()
         cargo_status = ship.cargo_status()
         match cargo_status:
@@ -34,7 +37,17 @@ class AbstractMining(ABC):
                     mining_table.add_column("symbol")
                     mining_table.add_column("yield")
                     while cargo_status.units < cargo_status.capacity:
-                        result = ship.extract()
+                        valid_survey = None
+                        if self.with_surveys:
+                            surveys = Survey.filter(symbol=destination)
+                            for s in surveys:
+                                if s.expiration.local_time < local_now():
+                                    valid_survey = s
+                            if valid_survey:
+                                self.console.print(
+                                    f"Using Survey {valid_survey.signature} to mine"
+                                )
+                        result = ship.extract(survey=valid_survey)
                         match result:
                             case Error():
                                 report_result(result, Extraction)
