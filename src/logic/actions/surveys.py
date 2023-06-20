@@ -55,7 +55,7 @@ class SurveyDestinationAction(AbstractShipNavigate):
         current_surveys = Survey.filter(symbol=self.destination)
         dropped_count: int = 0
         for survey in current_surveys:
-            if survey.expiration.local_time > current_time:
+            if survey.expiration.local_time < current_time:
                 survey.drop()
                 dropped_count += 1
 

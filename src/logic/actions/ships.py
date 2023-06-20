@@ -41,7 +41,7 @@ class AbstractMining(ABC):
                         if self.with_surveys:
                             surveys = Survey.filter(symbol=destination)
                             for s in surveys:
-                                if s.expiration.local_time < local_now():
+                                if s.expiration.local_time > local_now():
                                     valid_survey = s
                             if valid_survey:
                                 self.console.print(
