@@ -197,13 +197,13 @@ def system(symbol, depth):
 
 
 @click.command()
-@click.option("--ship",  help="Ship type", required=True)
+@click.option("--ship", help="Ship type", required=True)
 @click.option("--waypoint", help="Shipyard waypoint", required=True)
 @click.option("-d", "--depth", help="Expand fields", default=1)
 def buy_ship(ship, waypoint, depth):
     """
     Purchase a ship.
-    
+
     You must have a ship docked at this waypoint and it must have a shipyard.
     """
     from rich.pretty import pprint
@@ -230,9 +230,9 @@ def status(depth):
 
 
 @click.command()
-@click.option("--ship", help="ship symbol", required=True)
-@click.option("--id", help="Contract ID", required=True)
-@click.option("--mine", help="destination to mine", required=True)
+@click.option("--ship", "-s", help="ship symbol", required=True)
+@click.option("--id", "-c", help="Contract ID", required=True)
+@click.option("--mine", "-d", help="destination to mine", required=True)
 def contract_mining(ship, id, mine):
     """
     Set a ship on a loop procurring contract items
@@ -243,8 +243,8 @@ def contract_mining(ship, id, mine):
 
 
 @click.command()
-@click.option("--ship", help="ship symbol", required=True)
-@click.option("--dest", help="destination to mine", required=True)
+@click.option("--ship", "-s", help="ship symbol", required=True)
+@click.option("--dest", "-d", help="destination to mine", required=True)
 def mining(ship, dest):
     """
     Set a ship on the mining loop
@@ -252,6 +252,18 @@ def mining(ship, dest):
     from src.logic.main import mining_loop
 
     mining_loop(ship_symbol=ship, destination=dest)
+
+
+@click.command()
+@click.option("--ship", "-s", help="ship symbol", required=True)
+@click.option("--dest", "-d", help="destination", required=True)
+def navigate(ship, dest):
+    """
+    Set a ship to navigate to a destination
+    """
+    from src.logic.actions.ships import SimpleShipNavigateAction
+
+    SimpleShipNavigateAction(ship_symbol=ship, destination=dest).process()
 
 
 cli_group.add_command(register)
@@ -268,6 +280,7 @@ cli_group.add_command(system)
 cli_group.add_command(status)
 cli_group.add_command(mining)
 cli_group.add_command(contract_mining)
+cli_group.add_command(navigate)
 
 if __name__ == "__main__":
     cli_group()

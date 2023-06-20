@@ -6,6 +6,7 @@ help:
 
 install:  ## Install requirements ready for development
 	poetry install
+	createdb space_traders
 
 mypy: ## Run a static syntax check
 	poetry run mypy src/ cli.py
@@ -24,6 +25,11 @@ shell:  ## Run an ipython shell
 
 dbpatch:  ## Generate a new database patch automatically. Usage: make dbpatch message="my patch message"
 	alembic revision -m "$(message)" --autogenerate
+
+rebuild:  ## rebuild database from scratch
+	dropdb space_traders
+	createdb space_traders
+	alembic upgrade head
 
 upgradedb:  ## Upgrade the database with the latest db patches
 	alembic upgrade head

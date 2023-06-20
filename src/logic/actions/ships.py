@@ -11,6 +11,7 @@ from src.schemas.errors import Error
 from src.schemas.mining import Extraction
 from src.schemas.ships import Cargo, Nav, Ship
 from src.schemas.transactions import Transaction
+from src.schemas.waypoint import Waypoint
 from src.support.tables import report_result
 
 
@@ -104,15 +105,26 @@ class AbstractSellCargo(ABC):
 class AbstractShipNavigate(ABC):
     console: Console
     expenses: int
+    navigate_waypoint: Waypoint
 
-    def navigate_to(self, ship: Ship, destination: str) -> Ship:
+    def navigate_to(
+        self,
+        ship: Ship,
+        destination: str,
+        dock: Optional[bool] = True,
+        refuel: Optional[bool] = True,
+    ) -> Ship:
         """
         Navigate to the destination, returns the ship when it has arrived.
+        If dock is true, will attempt to dock when arrived.
+        If refuel is true, will refuel if the destination waypoint has a marketplace and is selling fuel.
         """
+        self.navigate_waypoint = Waypoint.get(symbol=destination)
         if ship.nav.waypointSymbol == destination and ship.nav.status in [
             "IN_ORBIT",
             "DOCKED",
         ]:
+            # Ship is already at this location
             return ship
         result = ship.orbit()
         result = ship.navigate(waypoint=destination)
@@ -133,15 +145,16 @@ class AbstractShipNavigate(ABC):
         self.console.print(
             f"Ship arrived at {destination}, docking and refuelling",
         )
-
-        result = ship.dock()
-        result = ship.refuel()
-        match result:
-            case Error():
-                report_result(result, Nav)
-            case dict():
-                report_result(result["transaction"], Transaction)
-                self.expenses += result["transaction"].totalPrice
+        if dock:
+            ship.dock()
+        if refuel and self.navigate_waypoint.can_refuel():
+            result = ship.refuel()
+            match result:
+                case Error():
+                    report_result(result, Nav)
+                case dict():
+                    report_result(result["transaction"], Transaction)
+                    self.expenses += result["transaction"].totalPrice
         return ship
 
 

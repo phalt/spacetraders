@@ -4,6 +4,7 @@ import attrs
 
 from src.api import PATHS, safe_get
 from src.schemas.errors import Error
+from src.schemas.markets import Market
 
 
 @attrs.define
@@ -49,6 +50,18 @@ class Waypoint:
     traits: List[Trait]
     chart: Chart
     faction: WaypointFaction
+
+    def can_refuel(self) -> bool:
+        """
+        True if this Waypoint has a market place and that
+        market place sells fuel
+        """
+        has_market_place = any([t.symbol == "MARKETPLACE" for t in self.traits])
+        if has_market_place:
+            marketplace = Market.get(self.symbol)
+            # Note we use tradeGoods because we should be at this location to see them.
+            sells_fuel = any([c.symbol == "FUEL" for c in marketplace.tradeGoods])
+            return sells_fuel
 
     @classmethod
     def build(cls, data: Dict) -> Self:
