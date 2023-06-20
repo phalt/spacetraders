@@ -62,12 +62,13 @@ def contracts(depth):
     """
     Returns contracts available to you
     """
-    from src.schemas.contracts import Contract, ContractManager
-    from src.support.tables import report_result
+    from rich.pretty import pprint
+
+    from src.schemas.contracts import ContractManager
 
     result = ContractManager.all()
     for contract in result.contracts:
-        report_result(contract, Contract)
+        pprint(contract, max_depth=int(depth))
 
 
 @click.command()
