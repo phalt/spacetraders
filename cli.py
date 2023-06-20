@@ -7,7 +7,7 @@ print(":rocket: Paul's SpaceTraders.io client :moon:")
 @click.group()
 def cli_group():
     """
-    CLI commands for Space traders
+    CLI commands for Paul's SpaceTraders.io client
     """
 
 
@@ -17,7 +17,7 @@ def cli_group():
 @click.argument("email", default="")
 def register(symbol, faction, email):
     """
-    Register a new agent.
+    Register a new agent
     """
     from rich.pretty import pprint
     from structlog import get_logger
@@ -47,7 +47,7 @@ After you saved that run `make query q='me'` to test it all worked
 @click.command()
 def me():
     """
-    Return Agent details about yourself
+    Details about yourself
     """
     from src.schemas.agent import Agent
     from src.support.tables import report_result
@@ -57,10 +57,10 @@ def me():
 
 
 @click.command()
-@click.argument("depth", default=1)
+@click.option("-d", "--depth", help="Expand fields", default=1)
 def contracts(depth):
     """
-    Returns contracts available to you
+    Contracts available to you
     """
     from rich.pretty import pprint
 
@@ -73,10 +73,10 @@ def contracts(depth):
 
 @click.command()
 @click.argument("symbol")
-@click.argument("depth", default=1)
+@click.option("-d", "--depth", help="Expand fields", default=1)
 def waypoint(symbol, depth):
     """
-    Return Waypoint information
+    Waypoint information
     """
     from rich.pretty import pprint
 
@@ -88,10 +88,10 @@ def waypoint(symbol, depth):
 
 @click.command()
 @click.argument("symbol")
-@click.argument("depth", default=1)
+@click.option("-d", "--depth", help="Expand fields", default=1)
 def shipyard(symbol, depth):
     """
-    Return Shipyard information
+    Shipyard information
     """
     from rich.pretty import pprint
 
@@ -103,10 +103,10 @@ def shipyard(symbol, depth):
 
 @click.command()
 @click.argument("symbol")
-@click.argument("depth", default=1)
-def market(symbol, depth):
+@click.option("-d", "--depth", help="Expand fields", default=1)
+def marketplace(symbol, depth):
     """
-    Return Market information
+    Market information
     """
     from rich.pretty import pprint
 
@@ -121,8 +121,7 @@ def market(symbol, depth):
 @click.argument("content", default="1")
 def ship(symbol, content):
     """
-    Return Ship information
-    Second argument determines content
+    Ship info. Second argument determines content
     """
     from rich.pretty import pprint
 
@@ -169,7 +168,7 @@ def ships(content):
 
 @click.command()
 @click.argument("symbol")
-@click.argument("depth", default=1)
+@click.option("-d", "--depth", help="Expand fields", default=1)
 def system_waypoints(symbol, depth):
     """
     Return SystemWaypoints information
@@ -184,7 +183,7 @@ def system_waypoints(symbol, depth):
 
 @click.command()
 @click.argument("symbol")
-@click.argument("depth", default=1)
+@click.option("-d", "--depth", help="Expand fields", default=1)
 def system(symbol, depth):
     """
     Return System information
@@ -198,13 +197,14 @@ def system(symbol, depth):
 
 
 @click.command()
-@click.argument("ship")
-@click.argument("waypoint")
-@click.argument("depth", default=1)
+@click.option("--ship",  help="Ship type", required=True)
+@click.option("--waypoint", help="Shipyard waypoint", required=True)
+@click.option("-d", "--depth", help="Expand fields", default=1)
 def buy_ship(ship, waypoint, depth):
     """
     Purchase a ship.
-    You must have a ship docked at this waypoint to purchase.
+    
+    You must have a ship docked at this waypoint and it must have a shipyard.
     """
     from rich.pretty import pprint
 
@@ -215,7 +215,7 @@ def buy_ship(ship, waypoint, depth):
 
 
 @click.command()
-@click.argument("depth", default=1)
+@click.option("-d", "--depth", help="Expand fields", default=1)
 def status(depth):
     """
     Purchase a ship.
@@ -230,40 +230,28 @@ def status(depth):
 
 
 @click.command()
-def loop():
+@click.option("--ship", help="ship symbol", required=True)
+@click.option("--id", help="Contract ID", required=True)
+@click.option("--mine", help="destination to mine", required=True)
+def contract_mining(ship, id, mine):
     """
-    Begin the automation loop.
-    """
-    from src.logic.main import main
-
-    main()
-
-
-@click.command()
-@click.argument("ship_symbol")
-@click.argument("contract_id")
-@click.argument("mining_destination")
-def contract_mining(ship_symbol, contract_id, mining_destination):
-    """
-    Set a ship on a loop procurring contract items.
-    Assumes contract is a simple mining contract.
-    We can get all info we need from the contract.
+    Set a ship on a loop procurring contract items
     """
     from src.logic.main import mining_contract_loop
 
-    mining_contract_loop(ship_symbol, contract_id, mining_destination)
+    mining_contract_loop(ship_symbol=ship, contract_id=id, mining_destination=mine)
 
 
 @click.command()
-@click.argument("ship_symbol")
-@click.argument("destination")
-def mining(ship_symbol, destination):
+@click.option("--ship", help="ship symbol", required=True)
+@click.option("--dest", help="destination to mine", required=True)
+def mining(ship, dest):
     """
-    Set a ship on the mining loop automation script.
+    Set a ship on the mining loop
     """
     from src.logic.main import mining_loop
 
-    mining_loop(ship_symbol, destination)
+    mining_loop(ship_symbol=ship, destination=dest)
 
 
 cli_group.add_command(register)
@@ -271,14 +259,13 @@ cli_group.add_command(me)
 cli_group.add_command(contracts)
 cli_group.add_command(waypoint)
 cli_group.add_command(shipyard)
-cli_group.add_command(market)
+cli_group.add_command(marketplace)
 cli_group.add_command(ship)
 cli_group.add_command(ships)
 cli_group.add_command(buy_ship)
 cli_group.add_command(system_waypoints)
 cli_group.add_command(system)
 cli_group.add_command(status)
-cli_group.add_command(loop)
 cli_group.add_command(mining)
 cli_group.add_command(contract_mining)
 

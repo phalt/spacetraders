@@ -4,6 +4,10 @@ version = "0.1.0"
 description = ""
 authors = ["Paul Hallett <case@hey.com>"]
 readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.scripts]
+st = "cli:cli_group"
 
 [tool.poetry.dependencies]
 python = "^3.11"
