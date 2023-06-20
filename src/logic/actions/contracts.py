@@ -46,11 +46,7 @@ class ContractMiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining
         """
         cargo_limit = int(ship.cargo.capacity * 0.7)
         contract_goods_in_cargo = sum(
-            [
-                x.units
-                for x in ship.cargo.inventory
-                if x.symbol == self.contract_good
-            ]
+            [x.units for x in ship.cargo.inventory if x.symbol == self.contract_good]
         )
         if contract_goods_in_cargo > cargo_limit:
             return True
@@ -65,11 +61,7 @@ class ContractMiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining
         Deliver the goods for the contract with the ship
         """
         amount = sum(
-            [
-                x.units
-                for x in ship.cargo.inventory
-                if x.symbol == self.contract_good
-            ]
+            [x.units for x in ship.cargo.inventory if x.symbol == self.contract_good]
         )
         self.console.print(f"Delivering {amount} of {self.contract_good}")
         if self.contract_good and self.contract:

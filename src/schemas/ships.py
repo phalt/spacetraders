@@ -11,7 +11,8 @@ from .nav import Nav
 from .transactions import Transaction
 
 if TYPE_CHECKING:
-    pass
+    from .contracts import Contract
+
 
 @attrs.define
 class Inventory:
@@ -19,6 +20,7 @@ class Inventory:
     name: str
     description: str
     units: int
+
 
 @attrs.define
 class Cargo:
@@ -28,11 +30,8 @@ class Cargo:
 
     @classmethod
     def build(cls, data) -> Self:
-        inventory = [Inventory(**x) for x in data.pop('inventory')]
-        return cls(
-            **data,
-            inventory=inventory
-        )
+        inventory = [Inventory(**x) for x in data.pop("inventory")]
+        return cls(**data, inventory=inventory)
 
 
 @attrs.define
@@ -209,6 +208,19 @@ class Ship:
         match result:
             case dict():
                 return Nav(**result["nav"])
+            case _:
+                return result
+
+    def negotiate_contract(self) -> Union["Contract", Error]:
+        """
+        Negotiate and return a new contract
+        """
+        from .contracts import Contract
+
+        result = safe_post(path=PATHS.ship_negotiate_contract(self.symbol))
+        match result:
+            case dict():
+                return Contract.build(result["contract"])
             case _:
                 return result
 

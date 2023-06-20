@@ -82,6 +82,12 @@ class Paths:
         """
         return f"{self.ship(symbol=symbol)}/survey"
 
+    def ship_negotiate_contract(self, symbol: str) -> str:
+        """
+        API path to perform negotiation of a contract
+        """
+        return f"{self.ship(symbol=symbol)}/negotiate/contract"
+
     def system_waypoints(self, symbol: str) -> str:
         """
         Generate the API path for system_waypoints.
