@@ -23,6 +23,7 @@ pytz = "^2023.3"
 types-pytz = "^2023.3.0.0"
 numpy = "^1.25.0"
 alembic = "^1.11.1"
+psycopg2-binary = "^2.9.6"
 
 
 [build-system]

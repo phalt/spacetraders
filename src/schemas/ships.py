@@ -261,14 +261,12 @@ class Ship:
         """
         Perform a survey in the current location.
         """
-        from rich.pretty import pprint
 
         result = safe_post(path=PATHS.ship_survey(self.symbol))
-        pprint(result)
         match result:
             case dict():
                 return dict(
-                    surveys=[Survey(**x) for x in result["surveys"]],
+                    surveys=[Survey.build(x) for x in result["surveys"]],
                     cooldown=Cooldown(**result["cooldown"]),
                 )
             case _:

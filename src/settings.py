@@ -1,13 +1,51 @@
 from configparser import ConfigParser
+from os import environ
 from os.path import abspath, dirname, join
 from typing import Any, List
 
-from cachetools import TTLCache
 from structlog import get_logger
 
 log = get_logger(name=__name__)
 
 CONFIG_ROOT = dirname(dirname(abspath(__file__)))
+ENVIRONMENT = environ.get("ENVIRONMENT", "development")
+IN_DEVELOPMENT = ENVIRONMENT == "development"
+
+
+def database_url():
+    host = config.get("database", "host")
+    port = config.get("database", "port")
+    name = config.get("database", "name")
+    username = config.get("database", "username")
+    password = config.get("database", "password")
+
+    parts = ["postgresql://"]
+
+    if username:
+        parts.append(username)
+
+    if password and username != "readonly":
+        parts.append(":")
+        parts.append(password)
+
+    if username or password:
+        parts.append("@")
+
+    if host:
+        parts.append(host)
+
+    if port:
+        parts.append(":")
+        parts.append(port)
+
+    parts.append("/")
+    if name is not None:
+        parts.append(name)
+    # handles the password as a token - used in development (local) only
+    if IN_DEVELOPMENT and password and username == "readonly":
+        parts.append("&sslmode=require")
+        parts.append("&password=" + password)
+    return "".join(parts)
 
 
 class SpaceTradersConfig(ConfigParser):
@@ -49,4 +87,3 @@ class SpaceTradersCache:
 
 
 config = SpaceTradersConfig(config_path=CONFIG_ROOT)
-cache: TTLCache = TTLCache(maxsize=64, ttl=60)

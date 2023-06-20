@@ -22,6 +22,12 @@ clear-caches:  ## Clear any cache files
 shell:  ## Run an ipython shell
 	poetry run ipython
 
+dbpatch:  ## Generate a new database patch automatically. Usage: make dbpatch message="my patch message"
+	alembic revision -m "$(message)" --autogenerate
+
+upgradedb:  ## Upgrade the database with the latest db patches
+	alembic upgrade head
+
 query:  ## Run various queries against the CLI file. Use like `make query q="me"`
 	poetry run python cli.py $(q)
 
