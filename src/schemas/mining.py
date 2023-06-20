@@ -74,7 +74,7 @@ class Survey:
             signature=self.signature,
             symbol=self.symbol,
             deposits=self.deposits,
-            expiration=self.expiration,
+            expiration=self.expiration.raw,
             size=self.size,
         )
 

@@ -169,6 +169,11 @@ class SimpleShipNavigateAction(AbstractShipNavigate):
     console: Console = Console()
     expenses: int = 0
 
+    @property
+    def name(self) -> str:
+        return f"Ship {self.ship_symbol} navigating to {self.destination}"
+
     def process(self):
+        self.console.rule(self.name)
         ship = Ship.get(self.ship_symbol)
         self.navigate_to(ship, self.destination)

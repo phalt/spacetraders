@@ -266,6 +266,18 @@ def navigate(ship, dest):
     SimpleShipNavigateAction(ship_symbol=ship, destination=dest).process()
 
 
+@click.command()
+@click.option("--ship", "-s", help="ship symbol", required=True)
+@click.option("--dest", "-d", help="destination", required=True)
+def survey(ship, dest):
+    """
+    Set a ship to navigate to a destination and survey it endlessly
+    """
+    from src.logic.actions.surveys import SurveyDestinationAction
+
+    SurveyDestinationAction(ship_symbol=ship, destination=dest).process()
+
+
 cli_group.add_command(register)
 cli_group.add_command(me)
 cli_group.add_command(contracts)
@@ -281,6 +293,7 @@ cli_group.add_command(status)
 cli_group.add_command(mining)
 cli_group.add_command(contract_mining)
 cli_group.add_command(navigate)
+cli_group.add_command(survey)
 
 if __name__ == "__main__":
     cli_group()
