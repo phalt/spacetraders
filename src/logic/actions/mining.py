@@ -2,6 +2,7 @@ import attrs
 from rich.console import Console
 
 from src.schemas.ships import Ship
+from src.support.tables import blue, pink
 
 from .ships import AbstractMining, AbstractSellCargo, AbstractShipNavigate
 
@@ -26,5 +27,5 @@ class MiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining):
         ship = await self.sell_cargo(ship)
 
         self.console.print(
-            f"{ship.symbol} total earned from mining = {self.cargo_sales - self.expenses}"
+            f"{blue(ship.symbol)} total earned from mining = {pink(self.cargo_sales - self.expenses)}"
         )

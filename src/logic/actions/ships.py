@@ -13,7 +13,7 @@ from src.schemas.ships import Cargo, Nav, Ship
 from src.schemas.transactions import Transaction
 from src.schemas.waypoint import Waypoint
 from src.support.datetime import local_now
-from src.support.tables import blue, report_result, yellow
+from src.support.tables import blue, pink, report_result, yellow
 
 
 class AbstractMining(ABC):
@@ -113,7 +113,7 @@ class AbstractSellCargo(ABC):
                             this_cargo_sale += transaction.totalPrice
                 self.console.print(cargo_table)
                 self.console.print(
-                    f"{blue(ship.symbol)} earned from sales: {this_cargo_sale}"
+                    f"{blue(ship.symbol)} earned from sales: {pink(this_cargo_sale)}"
                 )
         return ship
 

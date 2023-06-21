@@ -10,6 +10,10 @@ from src.schemas.errors import Error
 X = TypeVar("X")
 
 
+def pink(c):
+    return f"[bold bright_magenta]{c}[/]"
+
+
 def blue(c):
     return f"[bold bright_cyan]{c}[/]"
 
