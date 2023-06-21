@@ -258,8 +258,13 @@ class Ship:
                     cooldown=Cooldown(**result["cooldown"]),
                     cargo=Cargo.build(result["cargo"]),
                 )
-            case _:
-                return result
+            case Error():
+                # See if the result is a survey exhaustion
+                if result.code == 4224:
+                    # Exhausted extraction, just return normal mine
+                    return await self.extract()
+                else:
+                    return result
 
     async def survey(self) -> Union[Dict, Error]:
         """
