@@ -51,14 +51,14 @@ class Waypoint:
     chart: Chart
     faction: WaypointFaction
 
-    def can_refuel(self) -> bool:
+    async def can_refuel(self) -> bool:
         """
         True if this Waypoint has a market place and that
         market place sells fuel
         """
         has_market_place = any([t.symbol == "MARKETPLACE" for t in self.traits])
         if has_market_place:
-            marketplace = Market.get(self.symbol)
+            marketplace = await Market.get(self.symbol)
             # Note we use tradeGoods because we should be at this location to see them.
             sells_fuel = any([c.symbol == "FUEL" for c in marketplace.tradeGoods])
             return sells_fuel
@@ -78,8 +78,8 @@ class Waypoint:
         return cls(**data, orbitals=orbitals, traits=traits)
 
     @classmethod
-    def get(cls, symbol: str) -> Union[Self, Error]:
-        result = safe_get(path=PATHS.waypoint(symbol=symbol))
+    async def get(cls, symbol: str) -> Union[Self, Error]:
+        result = await safe_get(path=PATHS.waypoint(symbol=symbol))
         match result:
             case dict():
                 return cls.build(result)
@@ -104,8 +104,8 @@ class Shipyard:
         return cls(**data)
 
     @classmethod
-    def get(cls, symbol: str) -> Union[Self, Error]:
-        result = safe_get(path=PATHS.shipyard(symbol=symbol))
+    async def get(cls, symbol: str) -> Union[Self, Error]:
+        result = await safe_get(path=PATHS.shipyard(symbol=symbol))
         match result:
             case dict():
                 return cls.build(result)

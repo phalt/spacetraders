@@ -152,35 +152,35 @@ class Ship:
         )
 
     @classmethod
-    def get(cls, symbol: str) -> Union[Self, Error]:
-        result = safe_get(path=PATHS.ship(symbol=symbol))
+    async def get(cls, symbol: str) -> Union[Self, Error]:
+        result = await safe_get(path=PATHS.ship(symbol=symbol))
         match result:
             case dict():
                 return cls.build(result)
             case _:
                 return result
 
-    def navigation_status(self) -> Union[Nav, Error]:
-        result = safe_get(path=PATHS.ship_nav(self.symbol))
+    async def navigation_status(self) -> Union[Nav, Error]:
+        result = await safe_get(path=PATHS.ship_nav(self.symbol))
         match result:
             case dict():
                 return Nav(**result)
             case _:
                 return result
 
-    def cargo_status(self) -> Union[Cargo, Error]:
-        result = safe_get(path=PATHS.ship_cargo(self.symbol))
+    async def cargo_status(self) -> Union[Cargo, Error]:
+        result = await safe_get(path=PATHS.ship_cargo(self.symbol))
         match result:
             case dict():
                 return Cargo.build(result)
             case _:
                 return result
 
-    def navigate(self, waypoint: str) -> Union[Nav, Error]:
+    async def navigate(self, waypoint: str) -> Union[Nav, Error]:
         """
         Navigate to a waypoint.
         """
-        result = safe_post(
+        result = await safe_post(
             path=PATHS.ship_navigate(self.symbol), data={"waypointSymbol": waypoint}
         )
         match result:
@@ -189,48 +189,48 @@ class Ship:
             case _:
                 return result
 
-    def orbit(self) -> Union[Nav, Error]:
+    async def orbit(self) -> Union[Nav, Error]:
         """
         Put ship in orbit
         """
-        result = safe_post(path=PATHS.ship_orbit(self.symbol))
+        result = await safe_post(path=PATHS.ship_orbit(self.symbol))
         match result:
             case dict():
                 return Nav(**result["nav"])
             case _:
                 return result
 
-    def dock(self) -> Union[Nav, Error]:
+    async def dock(self) -> Union[Nav, Error]:
         """
         Dock ship
         """
-        result = safe_post(path=PATHS.ship_dock(self.symbol))
+        result = await safe_post(path=PATHS.ship_dock(self.symbol))
         match result:
             case dict():
                 return Nav(**result["nav"])
             case _:
                 return result
 
-    def negotiate_contract(self) -> Union["Contract", Error]:
+    async def negotiate_contract(self) -> Union["Contract", Error]:
         """
         Negotiate and return a new contract
         """
         from .contracts import Contract
 
-        result = safe_post(path=PATHS.ship_negotiate_contract(self.symbol))
+        result = await safe_post(path=PATHS.ship_negotiate_contract(self.symbol))
         match result:
             case dict():
                 return Contract.build(result["contract"])
             case _:
                 return result
 
-    def refuel(self) -> Union[Dict, Error]:
+    async def refuel(self) -> Union[Dict, Error]:
         """
         Refuel ship
         """
         from .agent import Agent
 
-        result = safe_post(path=PATHS.ship_refuel(self.symbol))
+        result = await safe_post(path=PATHS.ship_refuel(self.symbol))
         match result:
             case dict():
                 return dict(
@@ -241,15 +241,15 @@ class Ship:
             case _:
                 return result
 
-    def extract(self, survey: Optional[Survey] = None) -> Union[Dict, Error]:
+    async def extract(self, survey: Optional[Survey] = None) -> Union[Dict, Error]:
         """
         Perform mining extraction at the current waypoint.
         """
         if survey:
-            data = dict(survey=survey.payload())
+            data = {"survey": survey.payload()}
         else:
             data = None
-        result = safe_post(path=PATHS.ship_extract(self.symbol), data=data)
+        result = await safe_post(path=PATHS.ship_extract(self.symbol), data=data)
         match result:
             case dict():
                 yield_ = result["extraction"].pop("yield")
@@ -261,12 +261,12 @@ class Ship:
             case _:
                 return result
 
-    def survey(self) -> Union[Dict, Error]:
+    async def survey(self) -> Union[Dict, Error]:
         """
         Perform a survey in the current location.
         """
 
-        result = safe_post(path=PATHS.ship_survey(self.symbol))
+        result = await safe_post(path=PATHS.ship_survey(self.symbol))
         match result:
             case dict():
                 return dict(
@@ -276,13 +276,13 @@ class Ship:
             case _:
                 return result
 
-    def sell(self, symbol: str, amount: int) -> Union[Dict, Error]:
+    async def sell(self, symbol: str, amount: int) -> Union[Dict, Error]:
         """
         Sell some items in cargo.
         """
         from .agent import Agent
 
-        result = safe_post(
+        result = await safe_post(
             path=PATHS.ship_sell(self.symbol), data={"symbol": symbol, "units": amount}
         )
         match result:
@@ -314,12 +314,12 @@ class ShipsManager:
         )
 
     @staticmethod
-    def buy_ship(ship_type: str, waypoint_symbol: str) -> Union[Ship, Error]:
+    async def buy_ship(ship_type: str, waypoint_symbol: str) -> Union[Ship, Error]:
         """
         Purchase a ship
         """
         post_data = dict(shipType=ship_type, waypointSymbol=waypoint_symbol)
-        result = safe_post(path=PATHS.MY_SHIPS, data=post_data)
+        result = await safe_post(path=PATHS.MY_SHIPS, data=post_data)
         match result:
             case dict():
                 return Ship(**result["ship"])

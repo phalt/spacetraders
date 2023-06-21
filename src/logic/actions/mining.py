@@ -17,14 +17,14 @@ class MiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining):
 
     @property
     def name(self) -> str:
-        return f"Ship {self.ship_symbol} mining @ {self.destination}"
+        return f"Ship {self.ship_symbol} mining loop @ {self.destination}"
 
-    def process(self):
-        ship = Ship.get(symbol=self.ship_symbol)
-        ship = self.navigate_to(ship, self.destination)
-        ship = self.mine_until_cargo_full(ship, self.destination)
-        ship = self.sell_cargo(ship)
+    async def process(self):
+        ship = await Ship.get(symbol=self.ship_symbol)
+        ship = await self.navigate_to(ship, self.destination)
+        ship = await self.mine_until_cargo_full(ship, self.destination)
+        ship = await self.sell_cargo(ship)
 
         self.console.print(
-            f"Total earned from mining run = {self.cargo_sales - self.expenses}"
+            f"{ship.symbol} total earned from mining = {self.cargo_sales - self.expenses}"
         )

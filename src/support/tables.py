@@ -10,6 +10,14 @@ from src.schemas.errors import Error
 X = TypeVar("X")
 
 
+def blue(c):
+    return f"[bold bright_cyan]{c}[/]"
+
+
+def yellow(c):
+    return f"[bold bright_yellow]{c}[/]"
+
+
 def report_result(result, HappyClass: Any):
     """
     Prints out different tables based on the result.

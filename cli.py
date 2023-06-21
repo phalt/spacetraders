@@ -4,6 +4,19 @@ from rich import print
 print(":rocket: Paul's SpaceTraders.io client :moon:")
 
 
+async def gather_functions(funcs):
+    import asyncio
+
+    tasks = [asyncio.create_task(f) for f in funcs]
+    return await asyncio.gather(*tasks)
+
+
+def run(funcs):
+    import asyncio
+
+    return asyncio.run(gather_functions(funcs))
+
+
 @click.group()
 def cli_group():
     """
@@ -52,7 +65,7 @@ def me():
     from src.schemas.agent import Agent
     from src.support.tables import report_result
 
-    result = Agent.me()
+    result = run([Agent.me()])[0]
     report_result(result, Agent)
 
 
@@ -82,7 +95,7 @@ def waypoint(symbol, depth):
 
     from src.schemas.waypoint import Waypoint
 
-    result = Waypoint.get(symbol=symbol)
+    result = run([Waypoint.get(symbol=symbol)])[0]
     pprint(result, max_depth=depth)
 
 
@@ -97,7 +110,7 @@ def shipyard(symbol, depth):
 
     from src.schemas.waypoint import Shipyard
 
-    result = Shipyard.get(symbol=symbol)
+    result = run([Shipyard.get(symbol=symbol)])[0]
     pprint(result, max_depth=int(depth))
 
 
@@ -112,7 +125,7 @@ def marketplace(symbol, depth):
 
     from src.schemas.markets import Market
 
-    result = Market.get(symbol=symbol)
+    result = run([Market.get(symbol=symbol)])[0]
     pprint(result, max_depth=int(depth))
 
 
@@ -128,13 +141,13 @@ def ship(symbol, content):
     from src.schemas.ships import Cargo, Nav, Ship
     from src.support.tables import report_result
 
-    ship = Ship.get(symbol=symbol)
+    ship = run([Ship.get(symbol=symbol)])[0]
     if content == "cargo":
         pprint(f"{ship.symbol}")
-        report_result(ship.cargo_status(), Cargo)
+        report_result(ship.cargo, Cargo)
     elif content == "nav":
         pprint(f"{ship.symbol}")
-        report_result(ship.navigation_status(), Nav)
+        report_result(ship.nav, Nav)
     else:
         pprint(ship, max_depth=int(content))
 
@@ -157,11 +170,11 @@ def ships(content):
     if content == "cargo":
         for ship in result.ships:
             console.rule(f"{ship.symbol}")
-            report_result(ship.cargo_status(), Cargo)
+            report_result(ship.cargo, Cargo)
     elif content == "nav":
         for ship in result.ships:
             console.rule(f"{ship.symbol}")
-            report_result(ship.navigation_status(), Nav)
+            report_result(ship.nav, Nav)
     else:
         pprint(result, max_depth=int(content))
 
@@ -192,7 +205,7 @@ def system(symbol, depth):
 
     from src.schemas.systems import System
 
-    result = System.get(symbol=symbol)
+    result = run([System.get(symbol=symbol)])[0]
     pprint(result, max_depth=int(depth))
 
 
@@ -210,7 +223,7 @@ def buy_ship(ship, waypoint, depth):
 
     from src.schemas.ships import ShipsManager
 
-    result = ShipsManager.buy_ship(ship_type=ship, waypoint_symbol=waypoint)
+    result = run([ShipsManager.buy_ship(ship_type=ship, waypoint_symbol=waypoint)])
     pprint(result, max_depth=int(depth))
 
 
@@ -243,7 +256,7 @@ def contract_mining(ship, id, mine):
 
 
 @click.command()
-@click.option("--ship", "-s", help="ship symbol", required=True)
+@click.option("--ship", "-s", help="ship symbol", required=True, multiple=True)
 @click.option("--dest", "-d", help="destination to mine", required=True)
 @click.option(
     "--surveys", default=False, help="Try and use surveys stored in the DB to help"
@@ -254,7 +267,10 @@ def mining(ship, dest, surveys):
     """
     from src.logic.main import mining_loop
 
-    mining_loop(ship_symbol=ship, destination=dest, with_surveys=surveys)
+    funcs = [
+        mining_loop(ship_symbol=s, destination=dest, with_surveys=surveys) for s in ship
+    ]
+    run(funcs)
 
 
 @click.command()
@@ -264,9 +280,12 @@ def navigate(ship, dest):
     """
     Set a ship to navigate to a destination
     """
+
     from src.logic.actions.ships import SimpleShipNavigateAction
 
-    SimpleShipNavigateAction(ship_symbol=ship, destination=dest).process()
+    nav = SimpleShipNavigateAction(ship_symbol=ship, destination=dest)
+
+    run([nav.process()])
 
 
 @click.command()

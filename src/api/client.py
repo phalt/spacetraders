@@ -1,4 +1,4 @@
-from time import sleep
+import asyncio
 from typing import Dict, Optional, Union
 
 import httpx
@@ -9,23 +9,24 @@ from src.settings import config
 headers = {"Authorization": f"Bearer {config.get('api', 'key')}"}
 
 client = httpx.Client(headers=headers)
+async_client = httpx.AsyncClient(headers=headers)
 # Mostly for making registration calls
 bare_client = httpx.Client()
 
 
-def safe_get(*, path: str) -> Union[Dict, Error]:
+async def safe_get(*, path: str) -> Union[Dict, Error]:
     """
-    Like client.get but handles API limits safely
-    by sleeping for the amount of time set by the API before trying again.
+    Like client.get but handles API limits safely by sleeping
+    for the amount of time set by the API before trying again.
     """
-    response = client.get(path)
+    response = await async_client.get(path)
     api_data = response.json()
     if api_data.get("error"):
         error = Error(**api_data["error"])
         if error.code == 429:
             # We've hit a rate limit, sleep a bit and call the API again
-            sleep(error.data["retryAfter"])
-            return safe_get(path=path)
+            await asyncio.sleep(error.data["retryAfter"])
+            return await safe_get(path=path)
         # Return other errors
         return error
     else:
@@ -33,19 +34,21 @@ def safe_get(*, path: str) -> Union[Dict, Error]:
         return api_data
 
 
-def safe_post(*, path: str, data: Optional[Dict] = None) -> Union[Dict, Error]:
+async def safe_post(*, path: str, data: Optional[Dict] = None) -> Union[Dict, Error]:
     """
     Like client.post but handles API limits safely
     by sleeping for the amount of time set by the API before trying again.
+    You should use `json` for any nested content you want to POST.
     """
-    response = client.post(path, data=data)
+
+    response = await async_client.post(path, json=data)
     api_data = response.json()
     if api_data.get("error"):
         error = Error(**api_data["error"])
         if error.code == 429:
             # We've hit a rate limit, sleep a bit and call the API again
-            sleep(error.data["retryAfter"])
-            return safe_post(path=path, data=data)
+            await asyncio.sleep(error.data["retryAfter"])
+            return await safe_post(path=path, data=data)
         # Return other errors
         return error
     else:

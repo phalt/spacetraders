@@ -50,8 +50,8 @@ class Market:
         )
 
     @classmethod
-    def get(cls, symbol: str) -> Union[Self, Error]:
-        result = safe_get(path=PATHS.market(symbol=symbol))
+    async def get(cls, symbol: str) -> Union[Self, Error]:
+        result = await safe_get(path=PATHS.market(symbol=symbol))
         match result:
             case dict():
                 return cls.build(result)

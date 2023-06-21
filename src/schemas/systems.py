@@ -46,8 +46,8 @@ class System:
         return cls(**data, waypoints=waypoints)
 
     @classmethod
-    def get(cls, symbol: str) -> Union[Self, Error]:
-        result = safe_get(path=PATHS.system(symbol))
+    async def get(cls, symbol: str) -> Union[Self, Error]:
+        result = await safe_get(path=PATHS.system(symbol))
         match result:
             case dict():
                 return cls.build(result)

@@ -24,11 +24,11 @@ class Agent:
     startingFaction: str
 
     @classmethod
-    def me(cls) -> Union[Self, Error]:
+    async def me(cls) -> Union[Self, Error]:
         """
         Returns the "you" version of an Agent
         """
-        result = safe_get(path=PATHS.MY_AGENT)
+        result = await safe_get(path=PATHS.MY_AGENT)
         match result:
             case dict():
                 return cls(**result)

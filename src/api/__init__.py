@@ -1,2 +1,2 @@
 from .paths import PATHS  # noqa
-from .client import client, bare_client, safe_get, safe_post  # noqa
+from .client import safe_get, safe_post, bare_client, client  # noqa
