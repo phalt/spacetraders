@@ -53,3 +53,24 @@ async def safe_post(*, path: str, data: Optional[Dict] = None) -> Union[Dict, Er
     else:
         api_data = api_data["data"]
         return api_data
+
+
+async def safe_patch(*, path: str, data: Optional[Dict] = None) -> Union[Dict, Error]:
+    """
+    Like client.patch but handles API limits safely
+    by sleeping for the amount of time set by the API before trying again.
+    """
+
+    response = await async_client.patch(path, json=data)
+    api_data = response.json()
+    if api_data.get("error"):
+        error = Error(**api_data["error"])
+        if error.code == 429:
+            # We've hit a rate limit, sleep a bit and call the API again
+            await asyncio.sleep(error.data["retryAfter"])
+            return await safe_patch(path=path, data=data)
+        # Return other errors
+        return error
+    else:
+        api_data = api_data["data"]
+        return api_data

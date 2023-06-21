@@ -109,6 +109,12 @@ class Paths:
         waypoint = symbol
         return f"{self.system_waypoints(symbol=symbol)}/{waypoint}"
 
+    def jumpgate(self, symbol: str) -> str:
+        """
+        Generate the API path for a jumpgate.
+        """
+        return f"{self.waypoint(symbol=symbol)}/jump-gate"
+
     def shipyard(self, symbol: str) -> str:
         """
         Generate the API path for a shipyard

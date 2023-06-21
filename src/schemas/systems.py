@@ -53,3 +53,41 @@ class System:
                 return cls.build(result)
             case _:
                 return result
+
+
+@attrs.define
+class JumpGateSystem:
+    factionSymbol: str
+    symbol: str
+    sectorSymbol: str
+    type: str
+    x: int
+    y: int
+    distance: int
+
+    @classmethod
+    def build(cls, data: Dict) -> Self:
+        return cls(**data)
+
+
+@attrs.define
+class JumpGate:
+    jumpRange: int
+    factionSymbol: str
+    connectedSystems: List[JumpGateSystem]
+
+    @classmethod
+    def build(cls, data: Dict) -> Self:
+        connected_systems = [
+            JumpGateSystem.build(x) for x in data.pop("connectedSystems")
+        ]
+        return cls(**data, connectedSystems=connected_systems)
+
+    @classmethod
+    async def get(cls, symbol: str) -> Union[Self, Error]:
+        result = await safe_get(path=PATHS.jumpgate(symbol))
+        match result:
+            case dict():
+                return cls.build(result)
+            case _:
+                return result

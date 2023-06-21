@@ -148,10 +148,16 @@ class AbstractShipNavigate(ABC):
             self.console.print(f"{blue(ship.symbol)} arrrived @ {yellow(destination)}")
             return ship
         result = await ship.orbit()
+
+        if ship.frame.symbol == "FRAME_PROBE":
+            # Probes always have a solar-powered drive, so we should always BURN
+            self.console.print(f"{blue(ship.symbol)} set flight mode to BURN")
+            await ship.update_navigation(flight_mode="BURN")
         self.console.print(
             f"{blue(ship.symbol)} navigating to destination {yellow(destination)}"
         )
         arrived = False
+        await ship.navigate(waypoint=destination)
         while arrived is False:
             result = await ship.navigation_status()
             if result.waypointSymbol == destination and result.status == "IN_ORBIT":

@@ -66,6 +66,7 @@ class SurveyDestinationAction(AbstractShipNavigate):
         self.console.rule(self.name)
         ship = await Ship.get(symbol=self.ship_symbol)
         ship = await self.navigate_to(ship, self.destination)
+        await ship.orbit()
         while True:
             current_time = local_now()
             if self.clean_up_old_surveys:

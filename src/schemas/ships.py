@@ -1,8 +1,8 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Self, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Self, Union
 
 import attrs
 
-from src.api import PATHS, client, safe_get, safe_post
+from src.api import PATHS, client, safe_get, safe_patch, safe_post
 
 from .errors import Error
 from .generic import Cooldown
@@ -12,6 +12,8 @@ from .transactions import Transaction
 
 if TYPE_CHECKING:
     from .contracts import Contract
+
+FLIGHT_MODES = Literal["DRIFT", "STEALTH", "CRUISE", "BURN"]
 
 
 @attrs.define
@@ -162,6 +164,17 @@ class Ship:
 
     async def navigation_status(self) -> Union[Nav, Error]:
         result = await safe_get(path=PATHS.ship_nav(self.symbol))
+        match result:
+            case dict():
+                return Nav(**result)
+            case _:
+                return result
+
+    async def update_navigation(
+        self, flight_mode: Optional[FLIGHT_MODES] = None
+    ) -> Union[Nav, Error]:
+        data = {"flightMode": flight_mode}
+        result = await safe_patch(path=PATHS.ship_nav(self.symbol), data=data)
         match result:
             case dict():
                 return Nav(**result)

@@ -210,6 +210,21 @@ def system(symbol, depth):
 
 
 @click.command()
+@click.argument("symbol")
+@click.option("-d", "--depth", help="Expand fields", default=1)
+def jump_gate(symbol, depth):
+    """
+    Return JumpGate information
+    """
+    from rich.pretty import pprint
+
+    from src.schemas.systems import JumpGate
+
+    result = run([JumpGate.get(symbol=symbol)])[0]
+    pprint(result, max_depth=int(depth))
+
+
+@click.command()
 @click.option("--ship", help="Ship type", required=True)
 @click.option("--waypoint", help="Shipyard waypoint", required=True)
 @click.option("-d", "--depth", help="Expand fields", default=1)
@@ -231,8 +246,7 @@ def buy_ship(ship, waypoint, depth):
 @click.option("-d", "--depth", help="Expand fields", default=1)
 def status(depth):
     """
-    Purchase a ship.
-    You must have a ship docked at this waypoint to purchase.
+    Display the basic server status data.
     """
     from rich.pretty import pprint
 
@@ -326,6 +340,7 @@ cli_group.add_command(mining)
 cli_group.add_command(contract_mining)
 cli_group.add_command(navigate)
 cli_group.add_command(survey)
+cli_group.add_command(jump_gate)
 
 if __name__ == "__main__":
     cli_group()
