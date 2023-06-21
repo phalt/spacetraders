@@ -52,6 +52,7 @@ class AbstractMining(ABC):
                     result = await ship.extract(survey=valid_survey)
                     match result:
                         case Error():
+                            self.console.print(result)
                             cooldown = result.data.get("cooldown")
                             if cooldown:
                                 await asyncio.sleep(cooldown["remainingSeconds"])
@@ -96,6 +97,7 @@ class AbstractSellCargo(ABC):
                     for x in cargo.inventory
                     if x.symbol not in do_not_sell_symbols
                 ]
+                self.console.print(items_units)
                 for symbol, units in items_units:
                     result = await ship.sell(symbol=symbol, amount=units)
                     match result:
