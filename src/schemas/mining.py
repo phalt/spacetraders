@@ -47,7 +47,7 @@ class Survey:
         return cls(**data, expiration=date_time)
 
     @classmethod
-    def filter(cls, symbol: str, size: Optional[str] = None) -> List[Self]:
+    def filter(cls, symbol: str, size: Optional[List[str]] = None) -> List[Self]:
         """
         Return a list of Surveys that match the symbol and size
         """
@@ -56,7 +56,7 @@ class Survey:
                 SurveyModel.symbol == symbol
             )
             if size:
-                survey_models.filter(SurveyModel.size == size)
+                survey_models = survey_models.filter(SurveyModel.size.in_(size))
 
         return [
             cls(

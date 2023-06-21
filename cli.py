@@ -263,7 +263,7 @@ def contract_mining(ship, id, mine):
 )
 def mining(ship, dest, surveys):
     """
-    Set a ship on the mining loop
+    Set ships on the mining loop
     """
     from src.logic.main import mining_loop
 
@@ -274,32 +274,40 @@ def mining(ship, dest, surveys):
 
 
 @click.command()
-@click.option("--ship", "-s", help="ship symbol", required=True)
+@click.option("--ship", "-s", help="ship symbol", multiple=True, required=True)
 @click.option("--dest", "-d", help="destination", required=True)
 def navigate(ship, dest):
     """
-    Set a ship to navigate to a destination
+    Set ships to navigate to a destination
     """
 
     from src.logic.actions.ships import SimpleShipNavigateAction
 
-    nav = SimpleShipNavigateAction(ship_symbol=ship, destination=dest)
+    funcs = [
+        SimpleShipNavigateAction(ship_symbol=s, destination=dest).process()
+        for s in ship
+    ]
 
-    run([nav.process()])
+    run(funcs)
 
 
 @click.command()
-@click.option("--ship", "-s", help="ship symbol", required=True)
+@click.option("--ship", "-s", help="ship symbol", multiple=True, required=True)
 @click.option("--dest", "-d", help="destination", required=True)
 def survey(ship, dest):
     """
-    Set a ship to navigate to a destination and survey it endlessly
+    Set ships to navigate to a destination and survey it endlessly
     """
     from src.logic.actions.surveys import SurveyDestinationAction
 
-    SurveyDestinationAction(
-        ship_symbol=ship, destination=dest, clean_up_old_surveys=True
-    ).process()
+    funcs = [
+        SurveyDestinationAction(
+            ship_symbol=s, destination=dest, clean_up_old_surveys=True
+        ).process()
+        for s in ship
+    ]
+
+    run(funcs)
 
 
 cli_group.add_command(register)

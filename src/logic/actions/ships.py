@@ -41,13 +41,15 @@ class AbstractMining(ABC):
                 while cargo_status.units < cargo_status.capacity:
                     valid_survey = None
                     if self.with_surveys:
-                        surveys = Survey.filter(symbol=destination)
+                        surveys = Survey.filter(
+                            symbol=destination, size=["MODERATE", "LARGE"]
+                        )
                         for s in surveys:
                             if s.expiration.local_time > local_now():
                                 valid_survey = s
                         if valid_survey:
                             self.console.print(
-                                f"Using Survey {valid_survey.signature} to mine"
+                                f"{blue(ship.symbol)} using survey {blue(valid_survey.signature)} to mine"
                             )
                     result = await ship.extract(survey=valid_survey)
                     match result:
