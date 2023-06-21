@@ -38,7 +38,6 @@ async def safe_post(*, path: str, data: Optional[Dict] = None) -> Union[Dict, Er
     """
     Like client.post but handles API limits safely
     by sleeping for the amount of time set by the API before trying again.
-    You should use `json` for any nested content you want to POST.
     """
 
     response = await async_client.post(path, json=data)
