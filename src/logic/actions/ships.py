@@ -12,7 +12,7 @@ from src.schemas.mining import Extraction, Survey
 from src.schemas.ships import Cargo, Nav, Ship
 from src.schemas.systems import JumpGate, System
 from src.schemas.transactions import Transaction
-from src.schemas.waypoint import Waypoint
+from src.schemas.waypoint import Chart, Waypoint
 from src.support.datetime import local_now
 from src.support.distance import euclidean_distance
 from src.support.tables import blue, pink, report_result, yellow
@@ -260,6 +260,37 @@ class AbstractShipJump(ABC):
                     self.console.print(
                         f"{blue(ship.symbol)} arrrived @ {yellow(destination)}"
                     )
+        return ship
+
+
+class AbstractShipJump(ABC):
+    console: Console
+    expenses: int
+
+    async def chart_waypoint(
+        self,
+        ship: Ship,
+    ) -> Ship:
+        """
+        Attempt to Chart the ship's current waypoint.
+        If a Chart is made successfully, stores it in the database.
+        """
+
+        result = await ship.chart()
+        match result:
+            case Error():
+                if result.code == 4230:
+                    # This system was already charted, just return
+                    return
+                # Otherwise display the error
+                report_result(result)
+            case dict():
+                # We managed to chart the system!
+                chart: Chart = result["chart"]
+                self.console.print(
+                    f"{blue(ship.symbol)} charted {yellow(chart.waypointSymbol)}!"
+                )
+                chart.save()
         return ship
 
 

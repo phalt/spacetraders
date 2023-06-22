@@ -88,6 +88,12 @@ class Paths:
         """
         return f"{self.ship(symbol=symbol)}/survey"
 
+    def ship_chart(self, symbol: str) -> str:
+        """
+        API path to perform charting
+        """
+        return f"{self.ship(symbol=symbol)}/chart"
+
     def ship_negotiate_contract(self, symbol: str) -> str:
         """
         API path to perform negotiation of a contract

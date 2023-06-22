@@ -9,6 +9,7 @@ from .generic import Cooldown
 from .mining import Extraction, Survey
 from .nav import Nav
 from .transactions import Transaction
+from .waypoint import Chart, Waypoint
 
 if TYPE_CHECKING:
     from .contracts import Contract
@@ -167,6 +168,17 @@ class Ship:
         match result:
             case dict():
                 return Nav(**result)
+            case _:
+                return result
+
+    async def chart(self) -> Union[dict, Error]:
+        result = await safe_post(path=PATHS.ship_chart(self.symbol))
+        match result:
+            case dict():
+                return dict(
+                    chart=Chart.build(result["chart"]),
+                    waypoint=Waypoint.build(result["waypoint"]),
+                )
             case _:
                 return result
 

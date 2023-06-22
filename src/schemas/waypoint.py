@@ -3,8 +3,12 @@ from typing import Any, Dict, List, Optional, Self, Union
 import attrs
 
 from src.api import PATHS, safe_get
+from src.db import get_db
+from src.db.models.charts import ChartModel
+from src.db.models.waypoints import WaypointModel
 from src.schemas.errors import Error
 from src.schemas.markets import Market
+from src.support.datetime import DateTime
 
 
 @attrs.define
@@ -15,7 +19,38 @@ class WaypointFaction:
 @attrs.define
 class Chart:
     submittedBy: str
-    submittedOn: str
+    submittedOn: DateTime
+    waypointSymbol: Optional[str] = None
+
+    def asdict(self) -> Dict:
+        return dict(
+            submittedBy=self.submittedBy,
+            submittedOn=self.submittedOn.raw,
+            waypointSymbol=self.waypointSymbol,
+        )
+
+    @classmethod
+    def build(cls, data: Dict) -> Self:
+        return cls(
+            waypointSymbol=data.get("waypointSymbol", None),
+            submittedBy=data.get("submittedBy"),
+            submittedOn=DateTime.build(data.get("submittedOn")),
+        )
+
+    @classmethod
+    def save(self) -> Optional[Self]:
+        """
+        Save this chart to the database.
+        """
+        chart_model = ChartModel(
+            waypointSymbol=self.waypointSymbol,
+            submittedBy=self.submittedBy,
+            submittedOn=self.submittedOn.raw,
+        )
+
+        with get_db() as db:
+            db.add(chart_model)
+            db.commit()
 
 
 @attrs.define
@@ -50,6 +85,46 @@ class Waypoint:
     traits: List[Trait]
     chart: Chart
     faction: WaypointFaction
+    visited: Optional[bool] = None
+
+    def save(self, visited: Optional[bool] = False) -> None:
+        """
+        Persist in the database
+        """
+        model = WaypointModel(
+            systemSymbol=self.systemSymbol,
+            symbol=self.symbol,
+            visited=visited,
+            traits=[attrs.asdict(t) for t in self.traits],
+            orbitals=[attrs.asdict(o) for o in self.orbitals],
+            type=self.type,
+            x=self.x,
+            y=self.y,
+            faction=attrs.asdict(self.faction),
+            chart=self.chart.asdict(),
+        )
+
+        with get_db() as db:
+            db.add(model)
+            db.commit()
+
+    @classmethod
+    def from_db(cls, symbol: str) -> Optional[Self]:
+        """
+        Get a persisted instance of this from the database, if one exists.
+        """
+        with get_db() as db:
+            waypoint_model: WaypointModel = (
+                db.query(WaypointModel)
+                .filter(WaypointModel.symbol == symbol)
+                .one_or_none()
+            )
+
+        if waypoint_model:
+            data = waypoint_model.__dict__
+            data.pop("_sa_instance_state")
+            return cls.build(data)
+        return None
 
     async def can_refuel(self) -> bool:
         """
@@ -69,6 +144,8 @@ class Waypoint:
     def build(cls, data: Dict) -> Self:
         orbitals = [Orbital(**x) for x in data.pop("orbitals")]
         traits = []
+        chart = Chart.build(data.pop("chart"))
+        faction = WaypointFaction(**data.pop("faction"))
         for trait_data in data.pop("traits", []):
             trait = Trait(**trait_data)
             if trait.symbol == "SHIPYARD":
@@ -77,7 +154,9 @@ class Waypoint:
                     case Shipyard():
                         trait.shipyard = result
             traits.append(trait)
-        return cls(**data, orbitals=orbitals, traits=traits)
+        return cls(
+            **data, orbitals=orbitals, traits=traits, chart=chart, faction=faction
+        )
 
     @classmethod
     async def get(cls, symbol: str) -> Union[Self, Error]:

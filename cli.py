@@ -95,8 +95,16 @@ def waypoint(symbol, depth):
 
     from src.schemas.waypoint import Waypoint
 
-    result = run([Waypoint.get(symbol=symbol)])[0]
-    pprint(result, max_depth=depth)
+    result = Waypoint.from_db(symbol=symbol)
+    if result:
+        pprint("Found in database...")
+        pprint(result, max_depth=depth)
+    if not result:
+        pprint("Calling API...")
+        result = run([Waypoint.get(symbol=symbol)])[0]
+        if isinstance(result, Waypoint):
+            result.save()
+        pprint(result, max_depth=depth)
 
 
 @click.command()
