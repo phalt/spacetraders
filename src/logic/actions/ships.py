@@ -10,9 +10,11 @@ from rich.table import Table
 from src.schemas.errors import Error
 from src.schemas.mining import Extraction, Survey
 from src.schemas.ships import Cargo, Nav, Ship
+from src.schemas.systems import JumpGate, System
 from src.schemas.transactions import Transaction
 from src.schemas.waypoint import Waypoint
 from src.support.datetime import local_now
+from src.support.distance import euclidean_distance
 from src.support.tables import blue, pink, report_result, yellow
 
 
@@ -188,6 +190,73 @@ class AbstractShipNavigate(ABC):
         return ship
 
 
+class AbstractShipJump(ABC):
+    console: Console
+    expenses: int
+
+    async def jump_to(
+        self,
+        ship: Ship,
+        destination: str,
+    ) -> Ship:
+        """
+        Jump to the destination.
+        If the ship is not equipped with a jump drive, will check to see if the ship
+        is currently at a JumpGate otherwise it will not jump. (well, it can't!)
+        """
+        current_destination = ship.nav.waypointSymbol
+        has_jump_drive = any([s.symbol == "MODULE_JUMP_DRIVE_I" for s in ship.modules])
+        if has_jump_drive:
+            # Check the destination is within range of us
+            destination_system = await System.get(destination)
+            current_system = await System.get(ship.nav.systemSymbol)
+            distance = euclidean_distance(
+                [current_system.x, current_system.y],
+                [destination_system.x, destination_system.y],
+            )
+            if distance < 2000:
+                self.console.print(
+                    f"{blue(ship.symbol)} distance to {yellow(destination)} is {pink(distance)}."
+                )
+                can_jump = True
+            else:
+                can_jump = False
+                self.console.print(
+                    f"{blue(ship.symbol)} cannot jump {pink(distance)} units to {yellow(destination)}, max is 2000."
+                )
+        else:
+            self.console.print(
+                f"{blue(ship.symbol)} has no jump drive, checking we are at a jump gate..."
+            )
+            result = await JumpGate.get(current_destination)
+            match result:
+                case Error():
+                    self.console.print(
+                        f"Error getting jump-gate @ {yellow(destination)}"
+                    )
+                    report_result(result)
+                case JumpGate():
+                    can_jump = True
+        if can_jump:
+            self.console.print(f"{blue(ship.symbol)} jumping to {yellow(destination)}")
+            await ship.orbit()
+            result = await ship.jump(destination=destination)
+            match result:
+                case Error():
+                    self.console.print(f"Error jumping to {yellow(destination)}")
+                    report_result(result)
+                case dict():
+                    cooldown = result["cooldown"].remainingSeconds
+                    self.console.print(
+                        f"{blue(ship.symbol)} jump arriving in {pink(cooldown)} seconds"
+                    )
+                    await asyncio.sleep(cooldown)
+                    self.console.print(
+                        f"{blue(ship.symbol)} arrrived @ {yellow(destination)}"
+                    )
+        return ship
+
+
 @attrs.define
 class SimpleShipNavigateAction(AbstractShipNavigate):
     """
@@ -207,3 +276,23 @@ class SimpleShipNavigateAction(AbstractShipNavigate):
         self.console.rule(self.name)
         ship = await Ship.get(self.ship_symbol)
         ship = await self.navigate_to(ship, self.destination)
+
+
+@attrs.define
+class SimpleShipJumpAction(AbstractShipJump):
+    """
+    Simple action for jumping a ship to a destination.
+    """
+
+    destination: str
+    ship_symbol: str
+    console: Console = Console()
+
+    @property
+    def name(self) -> str:
+        return f"{self.ship_symbol} jumping to {self.destination}"
+
+    async def process(self):
+        self.console.rule(self.name)
+        ship = await Ship.get(self.ship_symbol)
+        ship = await self.jump_to(ship, self.destination)

@@ -313,6 +313,18 @@ class Ship:
             case _:
                 return result
 
+    async def jump(self, destination: str) -> Union[Dict, Error]:
+        result = await safe_post(
+            path=PATHS.ship_jump(self.symbol), data={"systemSymbol": destination}
+        )
+        match result:
+            case dict():
+                return dict(
+                    cooldown=Cooldown(**result["cooldown"]), nav=Nav(**result["nav"])
+                )
+            case _:
+                return result
+
 
 @attrs.define
 class ShipsManager:

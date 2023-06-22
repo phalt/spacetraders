@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Any, Iterable, Type, TypeVar
+from typing import Any, Iterable, Optional, Type, TypeVar
 
 import attrs
 from rich.console import Console
@@ -22,7 +22,7 @@ def yellow(c):
     return f"[bold bright_yellow]{c}[/]"
 
 
-def report_result(result, HappyClass: Any):
+def report_result(result, HappyClass: Optional[Any] = None):
     """
     Prints out different tables based on the result.
     """
@@ -31,7 +31,10 @@ def report_result(result, HappyClass: Any):
         case Error():
             console.print(attrs_to_rich_table(Error, [result]))
         case _:
-            console.print(attrs_to_rich_table(HappyClass, [result]))
+            if HappyClass:
+                console.print(attrs_to_rich_table(HappyClass, [result]))
+            else:
+                console.print("No `HappyClass` supplied!")
 
 
 def attrs_to_rich_table(row_type: Type[X], rows: Iterable[X]) -> Table:

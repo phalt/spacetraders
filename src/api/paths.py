@@ -70,6 +70,12 @@ class Paths:
         """
         return f"{self.ship(symbol=symbol)}/sell"
 
+    def ship_jump(self, symbol: str) -> str:
+        """
+        API path to jump ship
+        """
+        return f"{self.ship(symbol=symbol)}/jump"
+
     def ship_extract(self, symbol: str) -> str:
         """
         API path to perform mining extraction

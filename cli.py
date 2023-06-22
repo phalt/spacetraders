@@ -308,6 +308,23 @@ def navigate(ship, dest):
 @click.command()
 @click.option("--ship", "-s", help="ship symbol", multiple=True, required=True)
 @click.option("--dest", "-d", help="destination", required=True)
+def jump_ship(ship, dest):
+    """
+    Set ships to jump to a destination
+    """
+
+    from src.logic.actions.ships import SimpleShipJumpAction
+
+    funcs = [
+        SimpleShipJumpAction(ship_symbol=s, destination=dest).process() for s in ship
+    ]
+
+    run(funcs)
+
+
+@click.command()
+@click.option("--ship", "-s", help="ship symbol", multiple=True, required=True)
+@click.option("--dest", "-d", help="destination", required=True)
 def survey(ship, dest):
     """
     Set ships to navigate to a destination and survey it endlessly
@@ -341,6 +358,7 @@ cli_group.add_command(contract_mining)
 cli_group.add_command(navigate)
 cli_group.add_command(survey)
 cli_group.add_command(jump_gate)
+cli_group.add_command(jump_ship)
 
 if __name__ == "__main__":
     cli_group()
