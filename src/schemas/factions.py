@@ -22,8 +22,8 @@ class FactionsManager:
     factions: List[Faction]
 
     @classmethod
-    def mine(cls) -> Union[Self, Error]:
-        result = safe_get(path=PATHS.MY_FACTIONS)
+    async def mine(cls) -> Union[Self, Error]:
+        result = await safe_get(path=PATHS.MY_FACTIONS)
         match result:
             case dict():
                 return cls(factions=[Faction(**x) for x in result])
@@ -31,8 +31,8 @@ class FactionsManager:
                 return result
 
     @classmethod
-    def all(cls) -> Union[Self, Error]:
-        result = safe_get(path=PATHS.FACTIONS)
+    async def all(cls) -> Union[Self, Error]:
+        result = await safe_get(path=PATHS.FACTIONS)
         match result:
             case dict():
                 return cls(factions=[Faction(**x) for x in result])

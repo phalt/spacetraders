@@ -23,6 +23,6 @@ class Nav:
     flightMode: str
 
     @classmethod
-    def build(cls, data) -> Self:
+    def build(cls, data: Dict) -> Self:
         route = Route(**data.pop("route"))
         return cls(**data, route=route)

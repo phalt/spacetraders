@@ -12,4 +12,4 @@ def euclidean_distance(point_a: List[int], point_b: List[int]) -> float:
     loc_1 = array(point_a)
     loc_2 = array(point_b)
 
-    return linalg.norm(loc_1 - loc_2)
+    return float(linalg.norm(loc_1 - loc_2))

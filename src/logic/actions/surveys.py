@@ -38,9 +38,10 @@ class SurveyDestinationAction(AbstractShipNavigate):
         match result:
             case Error():
                 report_result(result, Survey)
-                cooldown = result.data.get("cooldown")
-                if cooldown:
-                    sleep(cooldown["remainingSeconds"])
+                if result.data:
+                    cooldown = result.data.get("cooldown")
+                    if cooldown:
+                        sleep(cooldown["remainingSeconds"])
             case dict():
                 surveys: List[Survey] = result["surveys"]
                 for survey in surveys:

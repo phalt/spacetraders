@@ -38,8 +38,8 @@ class Contract:
     deadlineToAccept: str
 
     @classmethod
-    def get(cls, contract_id: str) -> Union[Self, Error]:
-        result = safe_get(path=PATHS.contract(contract_id=contract_id))
+    async def get(cls, contract_id: str) -> Union[Self, Error]:
+        result = await safe_get(path=PATHS.contract(contract_id=contract_id))
         match result:
             case dict():
                 return cls.build(result)
@@ -47,17 +47,17 @@ class Contract:
                 return result
 
     @classmethod
-    def build(cls, data) -> Self:
+    def build(cls, data: Dict) -> Self:
         terms = Term(**data.pop("terms"))
         return cls(**data, terms=terms)
 
-    def fulfill(self) -> Union[Dict, Error]:
+    async def fulfill(self) -> Union[Dict, Error]:
         """
         Fullfills a contract.
         """
         from .agent import Agent
 
-        result = safe_post(path=PATHS.contract_fulfill(self.id))
+        result = await safe_post(path=PATHS.contract_fulfill(self.id))
         match result:
             case dict():
                 self.fulfilled = True
@@ -68,13 +68,13 @@ class Contract:
             case _:
                 return result
 
-    def accept(self) -> Union[Dict, Error]:
+    async def accept(self) -> Union[Dict, Error]:
         """
         Accepts a contract if it has not been accepted yet.
         """
         from .agent import Agent
 
-        result = safe_post(path=PATHS.contract_accept(self.id))
+        result = await safe_post(path=PATHS.contract_accept(self.id))
         match result:
             case dict():
                 self.accepted = True
@@ -85,10 +85,10 @@ class Contract:
             case _:
                 return result
 
-    def deliver(
+    async def deliver(
         self, ship_symbol: str, trade_symbol: str, amount: int
     ) -> Union[Dict, Error]:
-        result = safe_post(
+        result = await safe_post(
             path=PATHS.contract_deliver(self.id),
             data={
                 "shipSymbol": ship_symbol,

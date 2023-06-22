@@ -23,7 +23,7 @@ async def safe_get(*, path: str) -> Union[Dict, Error]:
     api_data = response.json()
     if api_data.get("error"):
         error = Error(**api_data["error"])
-        if error.code == 429:
+        if error.code == 429 and error.data:
             # We've hit a rate limit, sleep a bit and call the API again
             await asyncio.sleep(error.data["retryAfter"])
             return await safe_get(path=path)
@@ -44,7 +44,7 @@ async def safe_post(*, path: str, data: Optional[Dict] = None) -> Union[Dict, Er
     api_data = response.json()
     if api_data.get("error"):
         error = Error(**api_data["error"])
-        if error.code == 429:
+        if error.code == 429 and error.data:
             # We've hit a rate limit, sleep a bit and call the API again
             await asyncio.sleep(error.data["retryAfter"])
             return await safe_post(path=path, data=data)
@@ -65,7 +65,7 @@ async def safe_patch(*, path: str, data: Optional[Dict] = None) -> Union[Dict, E
     api_data = response.json()
     if api_data.get("error"):
         error = Error(**api_data["error"])
-        if error.code == 429:
+        if error.code == 429 and error.data:
             # We've hit a rate limit, sleep a bit and call the API again
             await asyncio.sleep(error.data["retryAfter"])
             return await safe_patch(path=path, data=data)

@@ -27,7 +27,7 @@ class ContractMiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining
     def name(self) -> str:
         return f"Ship {self.ship_symbol} peforming contract {self.contract_id}"
 
-    def set_up_contract(self) -> None:
+    async def set_up_contract(self) -> None:
         """
         Makes sure the contract is accepted and not fulfilled etc.
         Prints some useful information about it.
@@ -36,7 +36,7 @@ class ContractMiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining
             report_result(self.contract, Contract)
             if not self.contract.accepted:
                 self.console.print("Accepting contract...")
-                self.contract.accept()
+                await self.contract.accept()
 
             self.contract_good: str = self.contract.terms.deliver[0]["tradeSymbol"]
 
@@ -56,7 +56,7 @@ class ContractMiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining
             )
             return False
 
-    def deliver_goods(self, ship: Ship):
+    async def deliver_goods(self, ship: Ship) -> None:
         """
         Deliver the goods for the contract with the ship
         """
@@ -65,7 +65,7 @@ class ContractMiningLoop(AbstractShipNavigate, AbstractSellCargo, AbstractMining
         )
         self.console.print(f"Delivering {amount} of {self.contract_good}")
         if self.contract_good and self.contract:
-            self.contract.deliver(
+            await self.contract.deliver(
                 ship_symbol=ship.symbol, trade_symbol=self.contract_good, amount=amount
             )
 

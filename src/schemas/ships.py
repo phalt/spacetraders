@@ -31,7 +31,7 @@ class Cargo:
     inventory: List[Inventory]
 
     @classmethod
-    def build(cls, data) -> Self:
+    def build(cls, data: Dict) -> Self:
         inventory = [Inventory(**x) for x in data.pop("inventory")]
         return cls(**data, inventory=inventory)
 

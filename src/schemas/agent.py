@@ -9,7 +9,6 @@ from .contracts import Contract
 from .errors import Error
 from .factions import Faction
 from .ships import Ship
-from .waypoint import Waypoint
 
 
 @attrs.define
@@ -33,12 +32,6 @@ class Agent:
             case dict():
                 return cls(**result)
             case _:
-                return result
-
-    def headquarters_info(self) -> Waypoint:
-        result = Waypoint.get(self.headquarters)
-        match result:
-            case Waypoint():
                 return result
 
 

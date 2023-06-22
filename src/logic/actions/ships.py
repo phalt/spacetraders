@@ -1,7 +1,7 @@
 import asyncio
 from abc import ABC
 from collections import defaultdict
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import attrs
 from rich.console import Console
@@ -20,6 +20,7 @@ from src.support.tables import blue, pink, report_result, yellow
 
 class AbstractMining(ABC):
     with_surveys: bool
+    console: Console
 
     async def mine_until_cargo_full(self, ship: Ship, destination: str) -> Ship:
         await ship.orbit()
@@ -36,7 +37,7 @@ class AbstractMining(ABC):
                 self.console.print(
                     f"{blue(ship.symbol)} mining @ {yellow(destination)}"
                 )
-                mining_results = defaultdict(int)
+                mining_results: Dict[str, int] = defaultdict(int)
                 mining_table = Table(title=f"{blue(ship.symbol)} mining results")
                 mining_table.add_column("symbol")
                 mining_table.add_column("yield")
@@ -76,6 +77,8 @@ class AbstractMining(ABC):
 
 
 class AbstractSellCargo(ABC):
+    console: Console
+
     async def sell_cargo(
         self, ship: Ship, do_not_sell_symbols: Optional[List[str]] = []
     ) -> Ship:
@@ -210,20 +213,23 @@ class AbstractShipJump(ABC):
             # Check the destination is within range of us
             destination_system = await System.get(destination)
             current_system = await System.get(ship.nav.systemSymbol)
-            distance = euclidean_distance(
-                [current_system.x, current_system.y],
-                [destination_system.x, destination_system.y],
-            )
-            if distance < 2000:
-                self.console.print(
-                    f"{blue(ship.symbol)} distance to {yellow(destination)} is {pink(distance)}."
+            if isinstance(current_destination, System) and isinstance(
+                destination_system, System
+            ):
+                distance = euclidean_distance(
+                    [current_system.x, current_system.y],
+                    [destination_system.x, destination_system.y],
                 )
-                can_jump = True
-            else:
-                can_jump = False
-                self.console.print(
-                    f"{blue(ship.symbol)} cannot jump {pink(distance)} units to {yellow(destination)}, max is 2000."
-                )
+                if distance < 2000:
+                    self.console.print(
+                        f"{blue(ship.symbol)} distance to {yellow(destination)} is {pink(distance)}."
+                    )
+                    can_jump = True
+                else:
+                    can_jump = False
+                    self.console.print(
+                        f"{blue(ship.symbol)} cannot jump {pink(distance)} units to {yellow(destination)}, max is 2000."
+                    )
         else:
             self.console.print(
                 f"{blue(ship.symbol)} has no jump drive, checking we are at a jump gate..."

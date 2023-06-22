@@ -1,13 +1,10 @@
 from decimal import Decimal
-from typing import Any, Iterable, Optional, Type, TypeVar
 
 import attrs
 from rich.console import Console
 from rich.table import Table
 
 from src.schemas.errors import Error
-
-X = TypeVar("X")
 
 
 def pink(c):
@@ -22,7 +19,7 @@ def yellow(c):
     return f"[bold bright_yellow]{c}[/]"
 
 
-def report_result(result, HappyClass: Optional[Any] = None):
+def report_result(result, HappyClass=None):
     """
     Prints out different tables based on the result.
     """
@@ -37,7 +34,7 @@ def report_result(result, HappyClass: Optional[Any] = None):
                 console.print("No `HappyClass` supplied!")
 
 
-def attrs_to_rich_table(row_type: Type[X], rows: Iterable[X]) -> Table:
+def attrs_to_rich_table(row_type, rows):
     fields = attrs.fields(row_type)  # type: ignore
 
     table = Table(title=f"{row_type.__name__}")

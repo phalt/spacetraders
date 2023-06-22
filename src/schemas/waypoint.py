@@ -59,9 +59,11 @@ class Waypoint:
         has_market_place = any([t.symbol == "MARKETPLACE" for t in self.traits])
         if has_market_place:
             marketplace = await Market.get(self.symbol)
-            # Note we use tradeGoods because we should be at this location to see them.
-            sells_fuel = any([c.symbol == "FUEL" for c in marketplace.tradeGoods])
-            return sells_fuel
+            if isinstance(marketplace, Market):
+                # Note we use tradeGoods because we should be at this location to see them.
+                sells_fuel = any([c.symbol == "FUEL" for c in marketplace.tradeGoods])
+                return sells_fuel
+        return False
 
     @classmethod
     def build(cls, data: Dict) -> Self:

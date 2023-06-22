@@ -52,9 +52,7 @@ class Survey:
         Return a list of Surveys that match the symbol and size
         """
         with get_db() as db:
-            survey_models: List[SurveyModel] = db.query(SurveyModel).filter(
-                SurveyModel.symbol == symbol
-            )
+            survey_models = db.query(SurveyModel).filter(SurveyModel.symbol == symbol)
             if size:
                 survey_models = survey_models.filter(SurveyModel.size.in_(size))
 
@@ -91,7 +89,7 @@ class Survey:
         """
         Persist in the database
         """
-        survey_model: SurveyModel = SurveyModel(
+        survey_model = SurveyModel(
             signature=self.signature,
             symbol=self.symbol,
             deposits=self.deposits,
