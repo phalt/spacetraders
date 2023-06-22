@@ -34,15 +34,15 @@ class ShipExplore(AbstractShipNavigate, AbstractShipJump, AbstractShipChart):
         # Get the current system information.
         # Check to see which waypoints we have not visited yet.
         # If no waypoints remaining:
-        # Go to jump gate
-        # Jump
-        # Restart this loop
+            # Go to jump gate
+            # Jump
+            # Restart this loop
         # Otherwise randomly pick an unexplored waypoint.
         # Navigate to it
         # Chart it
         # If it is a market place
-        # record each trade good buy / sell value in the db.
+            # record each trade good buy / sell value in the db.
         # If it is a shipyard
-        # Record what ships are for sale and what price.
+            # Record what ships are for sale and what price.
         # Record that we have visited it, what it is, what the traits are, etc.
         # Restart this loop
