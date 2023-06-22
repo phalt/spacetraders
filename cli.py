@@ -95,16 +95,8 @@ def waypoint(symbol, depth):
 
     from src.schemas.waypoint import Waypoint
 
-    result = Waypoint.from_db(symbol=symbol)
-    if result:
-        pprint("Found in database...")
-        pprint(result, max_depth=depth)
-    if not result:
-        pprint("Calling API...")
-        result = run([Waypoint.get(symbol=symbol)])[0]
-        if isinstance(result, Waypoint):
-            result.save()
-        pprint(result, max_depth=depth)
+    result = run([Waypoint.get(symbol=symbol)])[0]
+    pprint(result, max_depth=depth)
 
 
 @click.command()
@@ -349,6 +341,19 @@ def survey(ship, dest):
     run(funcs)
 
 
+@click.command()
+@click.option("--ship", "-s", help="ship symbol", multiple=True, required=True)
+def explore(ship):
+    """
+    Set ships to explore the galaxy.
+    """
+    from src.logic.actions.explore import ShipExplore
+
+    funcs = [ShipExplore(ship_symbol=s).process() for s in ship]
+
+    run(funcs)
+
+
 cli_group.add_command(register)
 cli_group.add_command(me)
 cli_group.add_command(contracts)
@@ -367,6 +372,7 @@ cli_group.add_command(navigate)
 cli_group.add_command(survey)
 cli_group.add_command(jump_gate)
 cli_group.add_command(jump_ship)
+cli_group.add_command(explore)
 
 if __name__ == "__main__":
     cli_group()

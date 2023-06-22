@@ -1,11 +1,12 @@
 from typing import Any, Dict, List, Optional, Self, Union
 
 import attrs
+from sqlalchemy import update
 
 from src.api import PATHS, safe_get
 from src.db import get_db
 from src.db.models.charts import ChartModel
-from src.db.models.waypoints import WaypointModel
+from src.db.models.waypoints import MappedEnum, WaypointModel
 from src.schemas.errors import Error
 from src.schemas.markets import Market
 from src.support.datetime import DateTime
@@ -85,16 +86,16 @@ class Waypoint:
     traits: List[Trait]
     chart: Chart
     faction: WaypointFaction
-    visited: Optional[bool] = None
+    mapped: Optional[MappedEnum] = MappedEnum.UN_MAPPED
 
-    def save(self, visited: Optional[bool] = False) -> None:
+    def save(self, mapped: Optional[MappedEnum] = MappedEnum.UN_MAPPED) -> None:
         """
         Persist in the database
         """
         model = WaypointModel(
             systemSymbol=self.systemSymbol,
             symbol=self.symbol,
-            visited=visited,
+            mapped=mapped,
             traits=[attrs.asdict(t) for t in self.traits],
             orbitals=[attrs.asdict(o) for o in self.orbitals],
             type=self.type,
@@ -107,6 +108,16 @@ class Waypoint:
         with get_db() as db:
             db.add(model)
             db.commit()
+
+    def set_mapped(self) -> None:
+        with get_db() as db:
+            db.execute(
+                update(WaypointModel)
+                .where(WaypointModel.symbol == self.symbol)
+                .values(mapped=MappedEnum.MAPPED)
+            )
+            db.commit()
+        self.mapped = MappedEnum.MAPPED
 
     @classmethod
     def from_db(cls, symbol: str) -> Optional[Self]:
@@ -160,12 +171,18 @@ class Waypoint:
 
     @classmethod
     async def get(cls, symbol: str) -> Union[Self, Error]:
-        result = await safe_get(path=PATHS.waypoint(symbol=symbol))
-        match result:
-            case dict():
-                return cls.build(result)
-            case _:
-                return result
+        db_result = cls.from_db(symbol=symbol)
+        if db_result:
+            return db_result
+        else:
+            result = await safe_get(path=PATHS.waypoint(symbol=symbol))
+            match result:
+                case dict():
+                    api_result = cls.build(result)
+                    api_result.save()
+                    return api_result
+                case _:
+                    return result
 
 
 @attrs.define

@@ -2,6 +2,7 @@ import asyncio
 from typing import Dict, Optional, Union
 
 import httpx
+from rich.pretty import pprint
 
 from src.schemas.errors import Error
 from src.settings import config
@@ -19,7 +20,12 @@ async def safe_get(*, path: str) -> Union[Dict, Error]:
     Like client.get but handles API limits safely by sleeping
     for the amount of time set by the API before trying again.
     """
-    response = await async_client.get(path)
+    try:
+        response = await async_client.get(path)
+    except httpx.HTTPError as exc:
+        pprint(f"HTTP Exception for {exc.request.url} - {exc}")
+        await asyncio.sleep(1)
+        return await safe_get(path=path)
     api_data = response.json()
     if api_data.get("error"):
         error = Error(**api_data["error"])
@@ -39,8 +45,12 @@ async def safe_post(*, path: str, data: Optional[Dict] = None) -> Union[Dict, Er
     Like client.post but handles API limits safely
     by sleeping for the amount of time set by the API before trying again.
     """
-
-    response = await async_client.post(path, json=data)
+    try:
+        response = await async_client.post(path, json=data)
+    except httpx.HTTPError as exc:
+        pprint(f"HTTP Exception for {exc.request.url} - {exc}")
+        await asyncio.sleep(1)
+        return await safe_post(path=path, data=data)
     api_data = response.json()
     if api_data.get("error"):
         error = Error(**api_data["error"])
@@ -60,8 +70,12 @@ async def safe_patch(*, path: str, data: Optional[Dict] = None) -> Union[Dict, E
     Like client.patch but handles API limits safely
     by sleeping for the amount of time set by the API before trying again.
     """
-
-    response = await async_client.patch(path, json=data)
+    try:
+        response = await async_client.patch(path, json=data)
+    except httpx.HTTPError as exc:
+        pprint(f"HTTP Exception for {exc.request.url} - {exc}")
+        await asyncio.sleep(1)
+        return await safe_patch(path=path, data=data)
     api_data = response.json()
     if api_data.get("error"):
         error = Error(**api_data["error"])

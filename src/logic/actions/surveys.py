@@ -45,10 +45,13 @@ class SurveyDestinationAction(AbstractShipNavigate):
             case dict():
                 surveys: List[Survey] = result["surveys"]
                 for survey in surveys:
-                    self.console.print(
-                        f"{blue(ship.symbol)} found survey {yellow(survey.signature)} yield {survey.size}"
-                    )
-                    survey.save()
+                    if survey.size != "SMALL":
+                        self.console.print(
+                            f"{blue(ship.symbol)} found survey {yellow(survey.signature)} yield {survey.size}"
+                        )
+                        survey.save()
+                    else:
+                        self.console.print("Survey rubbish, discarding...")
                 cooldown = result["cooldown"].remainingSeconds
                 sleep(cooldown)
         return ship

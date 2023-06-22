@@ -4,3 +4,4 @@ from src.db.base_class import Base  # noqa
 from .models.surveys import SurveyModel  # noqa
 from .models.charts import ChartModel  # noqa
 from .models.waypoints import WaypointModel  # noqa
+from .models.systems import SystemModel, SystemMappingStatusModel  # noqa

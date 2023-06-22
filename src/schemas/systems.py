@@ -1,8 +1,12 @@
-from typing import Dict, List, Self, Union
+from typing import Dict, List, Optional, Self, Union
 
 import attrs
+from sqlalchemy import update
 
 from src.api import PATHS, client, safe_get
+from src.db import get_db
+from src.db.models.systems import SystemMappingStatusModel, SystemModel
+from src.db.models.waypoints import MappedEnum
 from src.schemas.errors import Error
 
 from .waypoint import Waypoint, WaypointSummary
@@ -39,6 +43,75 @@ class System:
     y: int
     waypoints: List[WaypointSummary]
     factions: List[Dict]
+    mapped: Optional[MappedEnum] = MappedEnum.UN_MAPPED
+
+    def save(self, mapped: Optional[MappedEnum] = MappedEnum.UN_MAPPED) -> None:
+        """
+        Persist in the database
+        """
+        model = SystemModel(
+            sectorSymbol=self.sectorSymbol,
+            symbol=self.symbol,
+            mapped=mapped,
+            waypoints=[attrs.asdict(w) for w in self.waypoints],
+            type=self.type,
+            x=self.x,
+            y=self.y,
+            factions=[attrs.asdict(f) for f in self.factions],
+        )
+
+        with get_db() as db:
+            db.add(model)
+            db.commit()
+
+    def mapping_in_progress(self, ship_symbol: str) -> None:
+        with get_db() as db:
+            db.execute(
+                update(SystemModel)
+                .where(SystemModel.symbol == self.symbol)
+                .values(mapped=MappedEnum.INCOMPLETE)
+            )
+            SystemMappingStatusModel.set_mapping(
+                symbol=self.symbol,
+                mapped=MappedEnum.INCOMPLETE,
+                ship_symbol=ship_symbol,
+            )
+            db.commit()
+        self.mapped = MappedEnum.INCOMPLETE
+
+    def mapping_complete(self, ship_symbol: str) -> None:
+        with get_db() as db:
+            db.execute(
+                update(SystemModel)
+                .where(
+                    SystemModel.symbol == self.symbol,
+                    SystemModel.mapped == MappedEnum.INCOMPLETE,
+                )
+                .values(mapped=MappedEnum.MAPPED)
+            )
+            SystemMappingStatusModel.set_mapping(
+                symbol=self.symbol,
+                mapped=MappedEnum.MAPPED,
+                ship_symbol=ship_symbol,
+            )
+            db.commit()
+        self.mapped = MappedEnum.MAPPED
+
+    @classmethod
+    def from_db(cls, symbol: str) -> Optional[Self]:
+        """
+        Get a persisted instance of this from the database, if one exists.
+        """
+        with get_db() as db:
+            system_model: SystemModel = (
+                db.query(SystemModel).filter(SystemModel.symbol == symbol).one_or_none()
+            )
+
+        if system_model:
+            data = system_model.__dict__
+            data.pop("_sa_instance_state")
+            return cls.build(data)
+        return None
 
     @classmethod
     def build(cls, data: Dict) -> Self:
@@ -47,10 +120,15 @@ class System:
 
     @classmethod
     async def get(cls, symbol: str) -> Union[Self, Error]:
+        db_result = cls.from_db(symbol=symbol)
+        if db_result:
+            return db_result
         result = await safe_get(path=PATHS.system(symbol))
         match result:
             case dict():
-                return cls.build(result)
+                api_result = cls.build(result)
+                api_result.save()
+                return api_result
             case _:
                 return result
 

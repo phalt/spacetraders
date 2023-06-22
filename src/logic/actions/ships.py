@@ -57,10 +57,12 @@ class AbstractMining(ABC):
                     result = await ship.extract(survey=valid_survey)
                     match result:
                         case Error():
+                            if result.data:
+                                cooldown = result.data.get("cooldown")
+                                if cooldown:
+                                    await asyncio.sleep(cooldown["remainingSeconds"])
                             self.console.print(result)
-                            cooldown = result.data.get("cooldown")
-                            if cooldown:
-                                await asyncio.sleep(cooldown["remainingSeconds"])
+                            await asyncio.sleep(1)
                         case dict():
                             extraction: Extraction = result["extraction"]
                             mining_results[
@@ -104,7 +106,6 @@ class AbstractSellCargo(ABC):
                     for x in cargo.inventory
                     if x.symbol not in do_not_sell_symbols
                 ]
-                self.console.print(items_units)
                 for symbol, units in items_units:
                     result = await ship.sell(symbol=symbol, amount=units)
                     match result:
@@ -150,17 +151,17 @@ class AbstractShipNavigate(ABC):
             "DOCKED",
         ]:
             # Ship is already at this location
-            self.console.print(f"{blue(ship.symbol)} arrrived @ {yellow(destination)}")
+            self.console.print(f"{blue(ship.symbol)} arrived @ {yellow(destination)}")
             return ship
         result = await ship.orbit()
 
+        self.console.print(
+            f"{blue(ship.symbol)} navigating to destination {yellow(destination)}"
+        )
         if ship.frame.symbol == "FRAME_PROBE":
             # Probes always have a solar-powered drive, so we should always BURN
             self.console.print(f"{blue(ship.symbol)} set flight mode to BURN")
             await ship.update_navigation(flight_mode="BURN")
-        self.console.print(
-            f"{blue(ship.symbol)} navigating to destination {yellow(destination)}"
-        )
         arrived = False
         await ship.navigate(waypoint=destination)
         while arrived is False:
@@ -175,7 +176,7 @@ class AbstractShipNavigate(ABC):
                 await asyncio.sleep(cooldown)
 
         self.console.print(
-            f"{blue(ship.symbol)} arrived at {yellow(destination)}",
+            f"{blue(ship.symbol)} arrived @ {yellow(destination)}",
         )
         if dock:
             self.console.print(f"{blue(ship.symbol)} docking")
@@ -189,7 +190,6 @@ class AbstractShipNavigate(ABC):
                 case dict():
                     report_result(result["transaction"], Transaction)
                     self.expenses += result["transaction"].totalPrice
-        self.console.print(f"{blue(ship.symbol)} arrrived @ {yellow(destination)}")
         return ship
 
 
@@ -258,12 +258,12 @@ class AbstractShipJump(ABC):
                     )
                     await asyncio.sleep(cooldown)
                     self.console.print(
-                        f"{blue(ship.symbol)} arrrived @ {yellow(destination)}"
+                        f"{blue(ship.symbol)} arrived @ {yellow(destination)}"
                     )
         return ship
 
 
-class AbstractShipJump(ABC):
+class AbstractShipChart(ABC):
     console: Console
     expenses: int
 

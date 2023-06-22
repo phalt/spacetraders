@@ -9,6 +9,10 @@ from src.settings import config
 LOCAL_TZ = config.get("time", "zone")
 
 
+def utc_now():
+    return datetime.now().astimezone(tz=pytz.timezone("utc"))
+
+
 def local_now():
     return datetime.now().astimezone(tz=pytz.timezone(LOCAL_TZ))
 
