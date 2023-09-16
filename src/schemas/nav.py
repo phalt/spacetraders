@@ -9,6 +9,7 @@ log = get_logger(__name__)
 @attrs.define
 class Route:
     departure: Dict[str, Any]
+    origin: Dict[str, Any]
     destination: Dict[str, Any]
     arrival: str
     departureTime: str
