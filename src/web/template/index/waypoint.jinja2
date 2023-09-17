@@ -1,0 +1,61 @@
+{% extends 'base.jinja2' %}
+
+{% block title %}{{waypoint.symbol}}{% endblock %}
+
+{% block content %}
+<h1>{{waypoint.symbol}}</h1>
+<div class="row">
+    <h3>Waypoint details</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Symbol</th>
+                <th scope="col">Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{waypoint.symbol}}</td>
+                <td>{{waypoint.type}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3>Traits</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trait in waypoint.traits %}
+            <tr>
+                <td>{{trait.symbol}}</td>
+                <td>{{trait.description}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if waypoint.orbitals %}
+    <h3>Orbitals</h3>
+    <ul>
+        {% for orbital in waypoint.orbitals %}
+        <li>
+            <a href="/waypoint/{{orbital.symbol}}">{{orbital.symbol}}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+
+<button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseExample"
+    aria-expanded="false" aria-controls="collapseExample">
+    debug
+</button>
+<div class="collapse" id="collapseExample">
+    <div class="card card-body">
+        {{waypoint}}</div>
+</div>
+
+{% endblock %}

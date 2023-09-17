@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Self, Union
 import attrs
 from sqlalchemy import update
 
-from src.api import PATHS, safe_get
+from src.api import PATHS, safe_get, sync_get
 from src.db import get_db
 from src.db.models.charts import ChartModel
 from src.db.models.waypoints import MappedEnum, WaypointModel
@@ -87,6 +87,7 @@ class Waypoint:
     chart: Chart
     faction: WaypointFaction
     mapped: Optional[MappedEnum] = MappedEnum.UN_MAPPED
+    orbits: Optional[str] = ""
 
     def save(self, mapped: Optional[MappedEnum] = MappedEnum.UN_MAPPED) -> None:
         """
@@ -168,6 +169,21 @@ class Waypoint:
         return cls(
             **data, orbitals=orbitals, traits=traits, chart=chart, faction=faction
         )
+    
+    @classmethod
+    def get_sync(cls, symbol: str) -> Self | Error:
+        db_result = cls.from_db(symbol=symbol)
+        if db_result:
+            return db_result
+        else:
+            result = sync_get(path=PATHS.waypoint(symbol=symbol))
+            match result:
+                case dict():
+                    api_result = cls.build(result)
+                    api_result.save()
+                    return api_result
+                case _:
+                    return result
 
     @classmethod
     async def get(cls, symbol: str) -> Union[Self, Error]:

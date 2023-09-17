@@ -15,7 +15,7 @@
             {% for ship in ships.ships %}
             <tr>
                 <td>{{ship.symbol}}</td>
-                <td>{{ship.nav.waypointSymbol}}</td>
+                <td><a href="/waypoint/{{ship.nav.waypointSymbol}}">{{ship.nav.waypointSymbol}}</a></td>
                 <td>{{ship.nav.status}}</td>
                 <td>{{ship.frame.symbol}}</td>
                 <td>{{ship.fuel.current}} / {{ship.fuel.capacity}}</td>
