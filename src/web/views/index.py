@@ -5,7 +5,7 @@ from flask import Blueprint
 
 from src.schemas.agent import Agent
 from src.schemas.ships import ShipsManager
-from src.schemas.waypoint import Waypoint
+from src.schemas.waypoint import Waypoint, Shipyard
 from src.web.app import app
 from src.web.rf.renderer import render_html
 
@@ -37,7 +37,13 @@ def ships():
 @routes.route('/waypoint/<waypoint_symbol>')
 @render_html()
 def waypoint(waypoint_symbol: str):
-    waypoint = Waypoint.get_sync(symbol=waypoint_symbol)
+    waypoint = Waypoint.sync_get(symbol=waypoint_symbol)
     return dict(waypoint=waypoint)
+
+@routes.route("/shipyard/<waypoint_symbol>")
+@render_html()
+def shipyard(waypoint_symbol: str):
+    shipyard = Shipyard.sync_get(symbol=waypoint_symbol)
+    return dict(shipyard=shipyard)
 
 app.register_blueprint(routes)

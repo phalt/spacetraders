@@ -1,0 +1,34 @@
+{% extends 'base.jinja2' %}
+
+{% block title %}Shipyard {{shipyard.symbol}}{% endblock %}
+
+{% block content %}
+<h1>Shipyard {{shipyard.symbol}}</h1>
+<div class="row">
+    <h3>Ship types for sale</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ship_type in shipyard.shipTypes %}
+            <tr>
+                <td>{{ship_type.type}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseExample"
+    aria-expanded="false" aria-controls="collapseExample">
+    debug
+</button>
+<div class="collapse" id="collapseExample">
+    <div class="card card-body">
+        {{shipyard}}</div>
+</div>
+
+{% endblock %}

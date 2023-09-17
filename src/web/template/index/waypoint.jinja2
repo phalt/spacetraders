@@ -31,7 +31,11 @@
         <tbody>
             {% for trait in waypoint.traits %}
             <tr>
+                {% if trait.symbol == "SHIPYARD" %}
+                    <td><a href="/shipyard/{{waypoint.symbol}}">{{trait.symbol}}</a></td>
+                {% else %}
                 <td>{{trait.symbol}}</td>
+                {% endif %}
                 <td>{{trait.description}}</td>
             </tr>
             {% endfor %}

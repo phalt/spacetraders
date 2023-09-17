@@ -171,7 +171,7 @@ class Waypoint:
         )
     
     @classmethod
-    def get_sync(cls, symbol: str) -> Self | Error:
+    def sync_get(cls, symbol: str) -> Self | Error:
         db_result = cls.from_db(symbol=symbol)
         if db_result:
             return db_result
@@ -212,10 +212,20 @@ class Shipyard:
     shipTypes: List[Dict[str, str]]
     transactions: List[Dict[str, Union[str, int]]]
     ships: List[Dict[str, Any]]
+    modificationsFee: int
 
     @classmethod
     def build(cls, data: Dict) -> Self:
         return cls(**data)
+    
+    @classmethod
+    def sync_get(cls, symbol: str) -> Self | Error:
+        result = sync_get(path=PATHS.shipyard(symbol=symbol))
+        match result:
+            case dict():
+                return cls.build(result)
+            case _:
+                return result
 
     @classmethod
     async def get(cls, symbol: str) -> Union[Self, Error]:
