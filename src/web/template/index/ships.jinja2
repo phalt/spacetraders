@@ -1,0 +1,27 @@
+<div class="row pt-4" id="ship-details">
+    <h3>Ships</h3>
+    <p>Total: {{ships.total}}</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Symbol</th>
+                <th scope="col">Waypoint</th>
+                <th scope="col">Status</th>
+                <th scope="col">Type</th>
+                <th scope="col">Fuel</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ship in ships.ships %}
+            <tr>
+                <td>{{ship.symbol}}</td>
+                <td>{{ship.nav.waypointSymbol}}</td>
+                <td>{{ship.nav.status}}</td>
+                <td>{{ship.frame.symbol}}</td>
+                <td>{{ship.fuel.current}} / {{ship.fuel.capacity}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button hx-get="/ships" hx-target="#ship-details" hx-swap="outerHTML">refresh</button>
+</div>

@@ -45,3 +45,6 @@ mining_loop:  ## Set a specific ship on a mining loop
 
 contract_loop:  ## Set up a specific ship to fulfill a contract
 	poetry run python cli.py contract-mining $(q)
+
+web:  ## Run the server
+	python server.py run

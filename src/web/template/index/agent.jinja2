@@ -1,0 +1,22 @@
+<div class="row" id="agent-details">
+    <h3>Agent details</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Symbol</th>
+                <th scope="col">Headquarters</th>
+                <th scope="col">Faction</th>
+                <th scope="col">Credits</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{agent.symbol}}</td>
+                <td>{{agent.headquarters}}</td>
+                <td>{{agent.startingFaction}}</td>
+                <td>{{agent.credits}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <button hx-get="/agent" hx-target="#agent-details">refresh</button>
+</div>

@@ -2,7 +2,7 @@ from typing import Optional, Self, Union
 
 import attrs
 
-from src.api import PATHS, bare_client, safe_get
+from src.api import PATHS, bare_client, safe_get, sync_get
 from src.api.utils import data_or_error
 
 from .contracts import Contract
@@ -21,6 +21,15 @@ class Agent:
     headquarters: str
     credits: int
     startingFaction: str
+
+    @classmethod
+    def me_sync(cls) -> Self | Error:
+        result = sync_get(path=PATHS.MY_AGENT)
+        match result:
+            case dict():
+                return cls(**result)
+            case _:
+                return result
 
     @classmethod
     async def me(cls) -> Union[Self, Error]:

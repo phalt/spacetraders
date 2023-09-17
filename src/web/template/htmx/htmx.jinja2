@@ -1,0 +1,84 @@
+{% extends 'base.jinja2' %}
+{% block title %}HTMX Examples{% endblock %}
+
+
+{% block content %}
+<h2>Inspect the source, go through each example</h2>
+
+<p>Normal anchor tag to another page: <a href="/other-page">Click me</a></p>
+<hr />
+
+
+
+
+<h2>HTMX examples</h2>
+<hr />
+
+
+
+
+<h3>HX-GET</h3>
+<h4>Simple example</h4>
+<p><div hx-get="/other-page">Click me</div></p>
+<hr />
+
+
+
+
+<h4>target another div</h4>
+<p><div id="swap-target-1">original content</div></p>
+<p><div hx-get="/other-page" hx-target="#swap-target-1">Click me</div></p>
+<hr />
+
+
+
+
+
+<h4>Control the swap strategy</h4>
+<p><div id="swap-target-extend">original content</div></p>
+<p><div hx-get="/other-page" hx-target="#swap-target-extend" hx-swap="afterend">Click me to extend the content</div></p>
+<hr />
+
+
+
+
+<h3>HX-POST</h3>
+<h4>Simple todo list</h4>
+<form hx-post="/post-example" hx-target="#post-target" hx-swap="beforeend">
+  <label>Todo item: <input name="item" type="text"></label>
+  <input type="submit" value="Add">
+</form>
+<ul id="post-target"></ul>
+<hr />
+
+
+
+{# <h3>Polling</h3>
+<div hx-get="poll" hx-trigger="every 1s" hx-swap="innerHTML"></div> #}
+
+
+<h3>Loading indicators!</h3>
+<div>
+    <button hx-get="/loading" hx-indicator="#indicator" hx-target="#loading-target">
+        Click Me!
+    </button>
+    <div id="loading-target"></div>
+    <div id="indicator" class="htmx-indicator spinner-border" role="status">
+      <span class="sr-only"></span>
+    </div>
+</div>
+
+
+<h3>Complex examples</h3>
+<h4>Progress bar</h4>
+<div>
+  <button class="btn btn-primary" hx-post="/progress" hx-swap="outerHTML">Install</button>
+</div>
+
+
+
+<h4>Choose your own adventure</h4>
+<div id="cyoa-target">
+  <button class="btn btn-primary" hx-get="/cyoa" hx-target="#cyoa-target" hx-swap="innerHTML">Start adventure</button>
+</div>
+{% endblock %}

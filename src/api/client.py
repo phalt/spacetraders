@@ -1,4 +1,5 @@
 import asyncio
+from time import sleep
 from typing import Dict, Optional, Union
 
 import httpx
@@ -13,6 +14,27 @@ client = httpx.Client(headers=headers)
 async_client = httpx.AsyncClient(headers=headers)
 # Mostly for making registration calls
 bare_client = httpx.Client()
+
+
+def sync_get(*, path: str) -> dict | Error:
+    try:
+        response = client.get(path)
+    except httpx.HTTPError as exc:
+        pprint(f"HTTP Exception for {exc.request.url} - {exc}")
+        sleep(1)
+        return sync_get(path=path)
+    api_data = response.json()
+    if api_data.get("error"):
+        error = Error(**api_data["error"])
+        if error.code == 429 and error.data:
+            # We've hit a rate limit, sleep a bit and call the API again
+            sleep(error.data["retryAfter"])
+            return sync_get(path=path)
+        # Return other errors
+        return error
+    else:
+        api_data = api_data["data"]
+        return api_data
 
 
 async def safe_get(*, path: str) -> Union[Dict, Error]:
