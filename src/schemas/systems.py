@@ -3,12 +3,13 @@ from typing import Dict, List, Optional, Self, Union
 import attrs
 from sqlalchemy import update
 
-from src.api import PATHS, client, safe_get
+from src.api import PATHS, client, safe_get, sync_get
 from src.db import get_db
 from src.db.models.systems import SystemMappingStatusModel, SystemModel
 from src.db.models.waypoints import MappedEnum
 from src.schemas.errors import Error
 
+from .factions import FactionSummary
 from .waypoint import Waypoint, WaypointSummary
 
 
@@ -42,7 +43,7 @@ class System:
     x: int
     y: int
     waypoints: List[WaypointSummary]
-    factions: List[Dict]
+    factions: List[FactionSummary]
     mapped: Optional[MappedEnum] = MappedEnum.UN_MAPPED
 
     def save(self, mapped: Optional[MappedEnum] = MappedEnum.UN_MAPPED) -> None:
@@ -116,7 +117,8 @@ class System:
     @classmethod
     def build(cls, data: Dict) -> Self:
         waypoints = [WaypointSummary(**x) for x in data.pop("waypoints")]
-        return cls(**data, waypoints=waypoints)
+        factions = [FactionSummary(**f) for f in data.pop("factions")]
+        return cls(**data, waypoints=waypoints, factions=factions)
 
     @classmethod
     async def get(cls, symbol: str) -> Union[Self, Error]:
@@ -124,6 +126,20 @@ class System:
         if db_result:
             return db_result
         result = await safe_get(path=PATHS.system(symbol))
+        match result:
+            case dict():
+                api_result = cls.build(result)
+                api_result.save()
+                return api_result
+            case _:
+                return result
+            
+    @classmethod
+    def sync_get(cls, symbol: str) -> Union[Self, Error]:
+        db_result = cls.from_db(symbol=symbol)
+        if db_result:
+            return db_result
+        result = sync_get(path=PATHS.system(symbol))
         match result:
             case dict():
                 api_result = cls.build(result)
@@ -164,6 +180,15 @@ class JumpGate:
     @classmethod
     async def get(cls, symbol: str) -> Union[Self, Error]:
         result = await safe_get(path=PATHS.jumpgate(symbol))
+        match result:
+            case dict():
+                return cls.build(result)
+            case _:
+                return result
+            
+    @classmethod
+    def sync_get(cls, symbol: str) -> Union[Self, Error]:
+        result = sync_get(path=PATHS.jumpgate(symbol))
         match result:
             case dict():
                 return cls.build(result)

@@ -6,6 +6,9 @@ from src.api import PATHS, safe_get
 
 from .errors import Error
 
+@attrs.define
+class FactionSummary:
+    symbol: str
 
 @attrs.define
 class Faction:

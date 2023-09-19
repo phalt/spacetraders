@@ -1,0 +1,52 @@
+{% extends 'base.jinja2' %}
+
+{% block title %}System {{system.symbol}}{% endblock %}
+
+{% block content %}
+<h1>{{system.symbol}}</h1>
+<div class="row">
+    <h3>System details</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Symbol</th>
+                <th scope="col">Type</th>
+                <th scope="col">Co-ordinates</th>
+                <th scope="col">Mapped</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{system.symbol}}</td>
+                <td>{{system.type}}</td>
+                <td>{{system.x}}, {{system.y}}</td>
+                <td>{{system.mapped}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3>Waypoints</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Symbol</th>
+                <th scope="col">Type</th>
+                <th scope="col">Co-ordinates</th>
+                <th scope="col">Orbits</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for waypoint in system.waypoints %}
+            <tr>
+                <td><a href="/waypoint/{{waypoint.symbol}}">{{waypoint.symbol}}</a></td>
+                <td>{{waypoint.type}}</td>
+                <td>{{waypoint.x}}, {{waypoint.y}}</td>
+                <td>{{waypoint.orbits}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{{debug.debugger(system)}}
+
+{% endblock %}

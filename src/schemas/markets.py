@@ -2,7 +2,7 @@ from typing import Dict, List, Self, Union
 
 import attrs
 
-from src.api import PATHS, safe_get
+from src.api import PATHS, safe_get, sync_get
 
 from .errors import Error
 from .transactions import Transaction
@@ -52,6 +52,15 @@ class Market:
     @classmethod
     async def get(cls, symbol: str) -> Union[Self, Error]:
         result = await safe_get(path=PATHS.market(symbol=symbol))
+        match result:
+            case dict():
+                return cls.build(result)
+            case _:
+                return result
+            
+    @classmethod
+    def sync_get(cls, symbol: str) -> Union[Self, Error]:
+        result = sync_get(path=PATHS.market(symbol=symbol))
         match result:
             case dict():
                 return cls.build(result)

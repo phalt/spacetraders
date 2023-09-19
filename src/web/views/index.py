@@ -6,6 +6,8 @@ from flask import Blueprint
 from src.schemas.agent import Agent
 from src.schemas.ships import ShipsManager
 from src.schemas.waypoint import Waypoint, Shipyard
+from src.schemas.markets import Market
+from src.schemas.systems import System, JumpGate
 from src.web.app import app
 from src.web.rf.renderer import render_html
 
@@ -38,12 +40,28 @@ def ships():
 @render_html()
 def waypoint(waypoint_symbol: str):
     waypoint = Waypoint.sync_get(symbol=waypoint_symbol)
-    return dict(waypoint=waypoint)
+    if waypoint.type == "JUMP_GATE":
+        jumpgate = JumpGate.sync_get(symbol=waypoint_symbol)
+    else:
+        jumpgate = None
+    return dict(waypoint=waypoint, jumpgate=jumpgate)
+
+@routes.route('/system/<system_symbol>')
+@render_html()
+def system(system_symbol: str):
+    system = System.sync_get(symbol=system_symbol)
+    return dict(system=system)
 
 @routes.route("/shipyard/<waypoint_symbol>")
 @render_html()
 def shipyard(waypoint_symbol: str):
     shipyard = Shipyard.sync_get(symbol=waypoint_symbol)
     return dict(shipyard=shipyard)
+
+@routes.route("/marketplace/<waypoint_symbol>")
+@render_html()
+def marketplace(waypoint_symbol: str):
+    marketplace = Market.sync_get(symbol=waypoint_symbol)
+    return dict(marketplace=marketplace)
 
 app.register_blueprint(routes)

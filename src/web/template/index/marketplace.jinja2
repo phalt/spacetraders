@@ -1,0 +1,75 @@
+{% extends 'base.jinja2' %}
+
+{% block title %}Marketplace {{marketplace.symbol}}{% endblock %}
+
+{% block content %}
+<h1>Marketplace {{marketplace.symbol}}</h1>
+<div class="row">
+    <h3>Trade goods</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Symbol</th>
+                <th scope="col">Supply</th>
+                <th scope="col">Volume</th>
+                <th scope="col">Buy</th>
+                <th scope="col">Sell</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for good in marketplace.tradeGoods %}
+            <tr>
+                <td>{{good.symbol}}</td>
+                <td>{{good.supply}}</td>
+                <td>{{good.tradeVolume}}</td>
+                <td>{{good.purchasePrice}}</td>
+                <td>{{good.sellPrice}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="row">
+    <div class="col">
+        <h4>Imports</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Symbol</th>
+                    <th scope="col">Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comod in marketplace.marketImports %}
+                <tr>
+                    <td>{{comod.symbol}}</td>
+                    <td>{{comod.name}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col">
+        <h4>Exports</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Symbol</th>
+                    <th scope="col">Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comod in marketplace.marketExports %}
+                <tr>
+                    <td>{{comod.symbol}}</td>
+                    <td>{{comod.name}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{{debug.debugger(marketplace)}}
+
+{% endblock %}

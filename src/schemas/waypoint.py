@@ -70,9 +70,11 @@ class Orbital:
 @attrs.define
 class WaypointSummary:
     symbol: str
+    orbitals: List[Orbital]
     type: str
     x: int
     y: int
+    orbits: Optional[str] = ""
 
 
 @attrs.define

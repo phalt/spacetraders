@@ -4,6 +4,7 @@
 
 {% block content %}
 <h1>{{waypoint.symbol}}</h1>
+<h2><a href="/system/{{waypoint.systemSymbol}}">System</a></h2>
 <div class="row">
     <h3>Waypoint details</h3>
     <table class="table">
@@ -32,7 +33,9 @@
             {% for trait in waypoint.traits %}
             <tr>
                 {% if trait.symbol == "SHIPYARD" %}
-                    <td><a href="/shipyard/{{waypoint.symbol}}">{{trait.symbol}}</a></td>
+                <td><a href="/shipyard/{{waypoint.symbol}}">{{trait.symbol}}</a></td>
+                {% elif trait.symbol == "MARKETPLACE" %}
+                <td><a href="/marketplace/{{waypoint.symbol}}">{{trait.symbol}}</a></td>
                 {% else %}
                 <td>{{trait.symbol}}</td>
                 {% endif %}
@@ -51,15 +54,33 @@
         {% endfor %}
     </ul>
     {% endif %}
+    {% if jumpgate %}
+    <h3>Jump gate connected systems</h3>
+    <p>range: {{jumpgate.jumpRange}}</p>
+    {{debug.debugger(jumpgate)}}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Symbol</th>
+                <th scope="col">Type</th>
+                <th scope="col">Distance</th>
+                <th scope="col">Co-ordinates</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for system in jumpgate.connectedSystems %}
+            <tr>
+                <td><a href="/system/{{system.symbol}}">{{system.symbol}}</a></td>
+                <td>{{system.type}}</td>
+                <td>{{system.distance}}</td>
+                <td>{{system.x}}, {{system.y}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
 </div>
 
-<button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseExample"
-    aria-expanded="false" aria-controls="collapseExample">
-    debug
-</button>
-<div class="collapse" id="collapseExample">
-    <div class="card card-body">
-        {{waypoint}}</div>
-</div>
+{{debug.debugger(waypoint)}}
 
 {% endblock %}
