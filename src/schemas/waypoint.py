@@ -35,7 +35,7 @@ class Chart:
         return cls(
             waypointSymbol=data.get("waypointSymbol", None),
             submittedBy=data.get("submittedBy"),
-            submittedOn=DateTime.build(data.get("submittedOn")),
+            submittedOn=DateTime.build(data.get("submittedOn", "")),
         )
 
     @classmethod
@@ -158,7 +158,7 @@ class Waypoint:
     def build(cls, data: Dict) -> Self:
         orbitals = [Orbital(**x) for x in data.pop("orbitals")]
         traits = []
-        chart = Chart.build(data.pop("chart"))
+        chart = Chart.build(data.pop("chart", {}))
         faction = WaypointFaction(**data.pop("faction"))
         for trait_data in data.pop("traits", []):
             trait = Trait(**trait_data)

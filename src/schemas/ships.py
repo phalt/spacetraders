@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Self, Unio
 
 import attrs
 
-from src.api import PATHS, client, safe_get, safe_patch, safe_post
+from src.api import PATHS, client, safe_get, safe_patch, safe_post, sync_get
 
 from .errors import Error
 from .generic import Cooldown
@@ -157,6 +157,15 @@ class Ship:
     @classmethod
     async def get(cls, symbol: str) -> Union[Self, Error]:
         result = await safe_get(path=PATHS.ship(symbol=symbol))
+        match result:
+            case dict():
+                return cls.build(result)
+            case _:
+                return result
+            
+    @classmethod
+    def sync_get(cls, symbol: str) -> Union[Self, Error]:
+        result = sync_get(path=PATHS.ship(symbol=symbol))
         match result:
             case dict():
                 return cls.build(result)

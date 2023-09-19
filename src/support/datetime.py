@@ -29,6 +29,8 @@ class DateTime:
 
     @classmethod
     def build(cls, datetime_string: str) -> Self:
-        utc_time = datetime.fromisoformat(datetime_string)
-        local_timezone = utc_time.astimezone(tz=pytz.timezone(LOCAL_TZ))
-        return cls(raw=datetime_string, utc_time=utc_time, local_time=local_timezone)
+        if datetime_string:
+            utc_time = datetime.fromisoformat(datetime_string)
+            local_timezone = utc_time.astimezone(tz=pytz.timezone(LOCAL_TZ))
+            return cls(raw=datetime_string, utc_time=utc_time, local_time=local_timezone)
+        return cls()

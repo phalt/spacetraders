@@ -1,0 +1,106 @@
+{% extends 'base.jinja2' %}
+
+{% block title %}Ship {{ship.symbol}}{% endblock %}
+
+{% block content %}
+<h1>{{ship.symbol}}</h1>
+<div class="row">
+    <h3>Ship status</h3>
+    <p>{{ship.symbol}} is currently <code>{{ship.nav.status}}</code> at <a
+            href="/waypoint/{{ship.nav.waypointSymbol}}">{{ship.nav.waypointSymbol}}</a> with flight mode
+        <code>{{ship.nav.flightMode}}</code>
+    </p>
+</div>
+<div class="pt-2 row border border-secondary">
+    <h2>Route status</h2>
+    <p>Departed <code>{{ship.nav.route.departureTime}}</code> and will arrive at <code>{{ship.nav.route.arrival}}</code>
+    </p>
+    <div class="col">
+        <h4>Departed</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Symbol</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Co-ordinates</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><a href="/waypoint/{{ship.nav.route.departure.symbol}}">{{ship.nav.route.departure.symbol}}</a>
+                    </td>
+                    <td>{{ship.nav.route.departure.type}}</td>
+                    <td>{{ship.nav.route.departure.x}}, {{ship.nav.route.departure.y}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col">
+        <h4>Origin</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Symbol</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Co-ordinates</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><a href="/waypoint/{{ship.nav.route.origin.symbol}}">{{ship.nav.route.origin.symbol}}</a></td>
+                    <td>{{ship.nav.route.origin.type}}</td>
+                    <td>{{ship.nav.route.origin.x}}, {{ship.nav.route.origin.y}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col">
+        <h4>Destination</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Symbol</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Co-ordinates</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><a
+                            href="/waypoint/{{ship.nav.route.destination.symbol}}">{{ship.nav.route.destination.symbol}}</a>
+                    </td>
+                    <td>{{ship.nav.route.destination.type}}</td>
+                    <td>{{ship.nav.route.destination.x}}, {{ship.nav.route.destination.y}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="pt-2 row border border-secondary">
+    <h2>Cargo</h2>
+    <p>Capacity: <b>{{ship.cargo.units}} / {{ship.cargo.capacity}}</b></p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Symbol</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Units</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cargo in ship.cargo.inventory %}
+            <tr>
+                <td>{{cargo.symbol}}</a></td>
+                <td>{{cargo.name}}</td>
+                <td>{{cargo.description}}</td>
+                <td>{{cargo.units}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{{debug.debugger(ship)}}
+
+{% endblock %}

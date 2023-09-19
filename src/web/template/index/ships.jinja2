@@ -14,7 +14,7 @@
         <tbody>
             {% for ship in ships.ships %}
             <tr>
-                <td>{{ship.symbol}}</td>
+                <td><a href="/ship/{{ship.symbol}}">{{ship.symbol}}</a></td>
                 <td><a href="/waypoint/{{ship.nav.waypointSymbol}}">{{ship.nav.waypointSymbol}}</a></td>
                 <td>{{ship.nav.status}}</td>
                 <td>{{ship.frame.symbol}}</td>

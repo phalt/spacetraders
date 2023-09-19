@@ -4,7 +4,7 @@ Index.py - provides a simple html example
 from flask import Blueprint
 
 from src.schemas.agent import Agent
-from src.schemas.ships import ShipsManager
+from src.schemas.ships import ShipsManager, Ship
 from src.schemas.waypoint import Waypoint, Shipyard
 from src.schemas.markets import Market
 from src.schemas.systems import System, JumpGate
@@ -34,6 +34,13 @@ def agent():
 def ships():
     ships = ShipsManager.all()
     return dict(ships=ships)
+
+
+@routes.route("/ship/<symbol>")
+@render_html()
+def ship(symbol: str):
+    ship = Ship.sync_get(symbol=symbol)
+    return dict(ship=ship)
 
 
 @routes.route('/waypoint/<waypoint_symbol>')
